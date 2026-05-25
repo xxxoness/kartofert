@@ -13,7 +13,7 @@ export function Footer() {
           <div>
             <Logo />
             <p className="mt-4 max-w-sm text-sm leading-6 text-[#596553]">
-              KartoFert — удобный магазин удобрений для картофеля. Каталог, расчёт количества, корзина и заявка менеджеру без лишней сложности.
+              KartoFert — удобный магазин удобрений для картофеля. Каталог, расчёт количества, корзина и оформление заказа без лишней сложности.
             </p>
             <Button asChild className="mt-5 rounded-[10px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]">
               <Link href="/products">Перейти в каталог</Link>
