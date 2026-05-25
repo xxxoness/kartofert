@@ -76,7 +76,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-9 flex flex-col gap-3 border-t border-[#173c25]/10 pt-5 text-xs font-semibold text-[#6d7468] md:flex-row md:items-center md:justify-between">
-          <p>© 2026 KartoFert. Демонстрационный интернет-магазин удобрений.</p>
+          <p>© 2026 KartoFert. Интернет-магазин удобрений для картофеля.</p>
           <div className="flex flex-wrap gap-4">
             <Link href="/faq" className="hover:text-[#063b23]">Вопросы и ответы</Link>
             <Link href="/delivery" className="hover:text-[#063b23]">Условия доставки</Link>
