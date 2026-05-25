@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { ContactForm } from "@/components/site/contact-form";
 
@@ -12,7 +12,6 @@ export default function ContactsPage() {
   const cards = [
     [Phone, "Телефон", siteConfig.phone],
     [Mail, "Электронная почта", siteConfig.email],
-    [MessageCircle, "Telegram", siteConfig.telegram],
     [MapPin, "Адрес", siteConfig.address]
   ] as const;
 

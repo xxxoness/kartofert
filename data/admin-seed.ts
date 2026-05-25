@@ -1,4 +1,4 @@
-export const adminDemoStats = {
+export const adminSeedStats = {
   newLeads: 6,
   calculations: 18,
   products: 15,
@@ -6,7 +6,7 @@ export const adminDemoStats = {
   orderSum: "160 ₽"
 };
 
-export const demoLeads = [
+export const initialLeads = [
   {
     id: "KF-240101",
     createdAt: new Date().toISOString(),
@@ -19,7 +19,7 @@ export const demoLeads = [
     amount: "400 кг, 16 мешков",
     total: "160 ₽",
     city: "Минск",
-    comment: "Демо-заявка для проверки админки"
+    comment: "Заявка для проверки админки"
   },
   {
     id: "KF-240102",

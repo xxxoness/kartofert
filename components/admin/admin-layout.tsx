@@ -78,7 +78,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             </div>
             <div className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-[#4f5e4f] shadow-sm">
               <BarChart3 className="h-4 w-4 text-[#1f7a45]" />
-              Демо-режим
+              Рабочий режим
             </div>
           </div>
           {children}

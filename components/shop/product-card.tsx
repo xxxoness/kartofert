@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Heart, ShoppingCart } from "lucide-react";
 import { Product, formatProductPrice } from "@/data/products";
 import { Button } from "@/components/ui/button";
-import { ProductBagMockup } from "@/components/shop/product-bag-mockup";
+import { ProductBagVisual } from "@/components/shop/product-bag-visual";
 import { useCart } from "@/components/shop/cart-provider";
 import { useProductsStore } from "@/components/shop/product-store";
 
@@ -27,7 +27,7 @@ export function ProductCard({ product: initialProduct }: { product: Product }) {
       </button>
 
       <Link href={`/products/${product.slug}`} className="grid min-h-[280px] place-items-end bg-gradient-to-b from-[#fffdf7] to-[#f7f1e5] px-5 pt-7">
-        <ProductBagMockup product={product} size="md" className="transition duration-300 group-hover:scale-[1.035]" />
+        <ProductBagVisual product={product} size="md" className="transition duration-300 group-hover:scale-[1.035]" />
       </Link>
 
       <div className="flex flex-1 flex-col px-5 pb-5 pt-4">

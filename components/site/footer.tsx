@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, MapPin, MessageCircle, Phone, Send } from "lucide-react";
+import { Mail, MapPin, Phone, Send } from "lucide-react";
 import { navItems, productCategories } from "@/data/categories";
 import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
@@ -51,10 +51,6 @@ export function Footer() {
                 <Mail className="h-4 w-4 text-[#1f7a45]" />
                 {siteConfig.email}
               </a>
-              <span className="flex items-center gap-2">
-                <MessageCircle className="h-4 w-4 text-[#1f7a45]" />
-                {siteConfig.telegram}
-              </span>
               <span className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-[#1f7a45]" />
                 {siteConfig.address}

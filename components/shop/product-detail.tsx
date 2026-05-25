@@ -7,7 +7,7 @@ import { Product, formatProductPrice } from "@/data/products";
 import { Article } from "@/data/articles";
 import { calculateFertilizer } from "@/data/calculator-rules";
 import { Button } from "@/components/ui/button";
-import { ProductBagMockup } from "@/components/shop/product-bag-mockup";
+import { ProductBagVisual } from "@/components/shop/product-bag-visual";
 import { ProductCard } from "@/components/shop/product-card";
 import { useCart } from "@/components/shop/cart-provider";
 import { useProductsStore } from "@/components/shop/product-store";
@@ -71,7 +71,7 @@ export function ProductDetail({
       <div className="grid gap-8 xl:grid-cols-[1.02fr_0.9fr_410px]">
         <div className="grid gap-4 sm:grid-cols-[86px_1fr]">
           <div className="hidden gap-3 sm:grid">
-            <Thumb active><ProductBagMockup product={product} size="sm" /></Thumb>
+            <Thumb active><ProductBagVisual product={product} size="sm" /></Thumb>
             <Thumb><Granules /></Thumb>
             <Thumb><PotatoMini /></Thumb>
             <Thumb><FieldMini /></Thumb>
@@ -86,7 +86,7 @@ export function ProductDetail({
             <div className="absolute bottom-0 left-0 right-0 h-28 bg-[radial-gradient(circle_at_50%_0%,#5b3922,#2b1b11)]" />
             <PotatoScatter />
             <div className="absolute bottom-12 left-1/2 z-10 -translate-x-1/2">
-              <ProductBagMockup product={product} size="lg" />
+              <ProductBagVisual product={product} size="lg" />
             </div>
           </div>
         </div>

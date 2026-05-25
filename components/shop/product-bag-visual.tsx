@@ -20,7 +20,7 @@ const themes: Record<Product["bagTheme"], { bag: string; ink: string; accent: st
   zola: { bag: "from-[#b9b3a4] via-[#575248] to-[#2f2e2a]", ink: "#fff8ea", accent: "#f5b400", light: "#ece7da" }
 };
 
-export function ProductBagMockup({
+export function ProductBagVisual({
   product,
   size = "md",
   className
@@ -86,7 +86,7 @@ export function ProductBagMockup({
 export function ProductVisual({ product, compact = false }: { product: Product; compact?: boolean }) {
   return (
     <div className={cn("relative grid place-items-center rounded-[22px] bg-[#fbf5e9]", compact ? "h-48" : "h-72")}>
-      <ProductBagMockup product={product} size={compact ? "sm" : "md"} />
+      <ProductBagVisual product={product} size={compact ? "sm" : "md"} />
     </div>
   );
 }

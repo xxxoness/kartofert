@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Calculator, FileText, Package, Users, Wallet } from "lucide-react";
 import { products } from "@/data/products";
 import { articles } from "@/data/articles";
-import { demoLeads } from "@/data/admin-demo";
+import { initialLeads } from "@/data/admin-seed";
 import { Lead, readLeads, saveLeads } from "@/components/shop/leads-store";
 
 export function AdminDashboard() {
@@ -14,8 +14,8 @@ export function AdminDashboard() {
   useEffect(() => {
     const saved = readLeads();
     if (!saved.length) {
-      saveLeads(demoLeads);
-      setLeads(demoLeads);
+      saveLeads(initialLeads);
+      setLeads(initialLeads);
     } else {
       setLeads(saved);
     }

@@ -1,7 +1,7 @@
 "use client";
 
 import { Product } from "@/data/products";
-import { ProductBagMockup } from "@/components/shop/product-bag-mockup";
+import { ProductBagVisual } from "@/components/shop/product-bag-visual";
 import { cn } from "@/lib/utils";
 
 export function PotatoHeroVisual({
@@ -37,7 +37,7 @@ export function PotatoHeroVisual({
               transform: `rotate(${index % 2 ? 2 : -2}deg) scale(${(index === 2 && !compact) || (compact && index === 1) ? 1.1 : 1})`
             }}
           >
-            <ProductBagMockup product={product} size={compact ? "sm" : "hero"} />
+            <ProductBagVisual product={product} size={compact ? "sm" : "hero"} />
           </div>
         ))}
       </div>

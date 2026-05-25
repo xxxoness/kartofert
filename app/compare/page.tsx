@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { products, formatProductPrice } from "@/data/products";
-import { ProductBagMockup } from "@/components/shop/product-bag-mockup";
+import { ProductBagVisual } from "@/components/shop/product-bag-visual";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
@@ -36,7 +36,7 @@ export default function ComparePage() {
               <th className="w-44 p-4 text-left text-sm font-black text-[#102116]">Параметр</th>
               {compared.map((product) => (
                 <th key={product.slug} className="p-4 text-left align-top">
-                  <ProductBagMockup product={product} size="sm" />
+                  <ProductBagVisual product={product} size="sm" />
                   <h2 className="mt-3 text-base font-black leading-tight text-[#102116]">{product.name}</h2>
                 </th>
               ))}

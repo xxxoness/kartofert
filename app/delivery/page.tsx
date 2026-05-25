@@ -3,15 +3,15 @@ import { CreditCard, FileText, MapPinned, Truck } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Доставка и оплата",
-  description: "Доставка удобрений KartoFert по Беларуси, самовывоз, B2B-счёт и демонстрационная оплата."
+  description: "Доставка удобрений KartoFert по Беларуси, самовывоз, B2B-счёт и онлайн-оплата заказа."
 };
 
 export default function DeliveryPage() {
   const cards = [
     [Truck, "Доставка по Беларуси", "Минск, Гомель, Брест, Гродно, Витебск, Могилёв и регионы."],
-    [MapPinned, "Самовывоз", "Возможен после подтверждения наличия и фасовки менеджером."],
+    [MapPinned, "Самовывоз", "Возможен после согласования наличия, фасовки и времени отгрузки."],
     [FileText, "B2B-счёт", "Для хозяйств и оптовых клиентов подготовим документы и счёт."],
-    [CreditCard, "Демо-оплата", "На сайте заявка имитирует оплату, финал подтверждает менеджер."]
+    [CreditCard, "Онлайн-оплата", "После оформления заказа можно перейти к оплате и передать заказ в обработку."]
   ] as const;
 
   return (
@@ -22,7 +22,7 @@ export default function DeliveryPage() {
           Поставка удобрений по Беларуси
         </h1>
         <p className="mt-5 text-lg leading-8 text-[#4d5a4e]">
-          Для дачников, фермерских хозяйств и оптовых клиентов. Итоговая цена и доставка подтверждаются менеджером.
+          Для дачников, фермерских хозяйств и оптовых клиентов. Подберём удобный способ получения и подготовим заказ к отгрузке.
         </p>
       </div>
       <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -37,7 +37,7 @@ export default function DeliveryPage() {
       <div className="mt-10 rounded-[18px] bg-[#fff3d8] p-7">
         <h2 className="text-2xl font-black tracking-[-0.035em] text-[#102116]">Как проходит заказ</h2>
         <ol className="mt-5 grid gap-3 md:grid-cols-5">
-          {["Вы выбираете товары", "Оформляете заявку", "Менеджер уточняет цены", "Согласуем доставку", "Отгружаем заказ"].map((item, index) => (
+          {["Вы выбираете товары", "Оформляете заказ", "Переходите к оплате", "Согласуем доставку", "Отгружаем заказ"].map((item, index) => (
             <li key={item} className="rounded-[14px] bg-white/70 p-4 text-sm font-bold text-[#3f493a]">{index + 1}. {item}</li>
           ))}
         </ol>

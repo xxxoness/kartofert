@@ -1,8 +1,7 @@
 export const siteConfig = {
   brandName: "KartoFert",
   phone: "+375 29 123-45-67",
-  email: "info@kartofert.by",
-  telegram: "@kartofert",
+  email: "kartofert.by@gmail.com",
   address: "Минск, доставка по Беларуси",
   siteDescription:
     "Интернет-магазин удобрений для картофеля: подбор по типу удобрения, расчёт количества и заявка на поставку.",

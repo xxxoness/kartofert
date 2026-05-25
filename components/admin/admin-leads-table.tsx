@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { demoLeads } from "@/data/admin-demo";
+import { initialLeads } from "@/data/admin-seed";
 import { Lead, LeadStatus, readLeads, saveLeads } from "@/components/shop/leads-store";
 
 export function AdminLeadsTable() {
@@ -12,8 +12,8 @@ export function AdminLeadsTable() {
   useEffect(() => {
     const saved = readLeads();
     if (!saved.length) {
-      saveLeads(demoLeads);
-      setLeads(demoLeads);
+      saveLeads(initialLeads);
+      setLeads(initialLeads);
     } else {
       setLeads(saved);
     }

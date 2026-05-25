@@ -121,8 +121,8 @@ function Hero() {
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <Button asChild className="h-[52px] rounded-[13px] bg-[#063b23] px-7 text-white shadow-[0_18px_40px_rgba(6,59,35,.18)] hover:bg-[#0d5a36] [&_*]:text-white">
-            <Link href="/products">
-              Перейти в каталог <ArrowRight className="h-5 w-5" />
+            <Link href="/products" className="text-white" style={{ color: "#fff" }}>
+              Перейти в каталог <ArrowRight className="h-5 w-5 text-white" />
             </Link>
           </Button>
           <Button asChild variant="outline" className="h-[52px] rounded-[13px] border-[#f5b400] bg-[#fffdf8] px-7 text-[#8c5b00] shadow-none hover:bg-[#fff4cf]">
