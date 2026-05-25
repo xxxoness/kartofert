@@ -1,0 +1,192 @@
+{
+  "brand": {
+    "logoFull": "/assets/brand/logo-full.svg",
+    "logoMark": "/assets/brand/logo-mark.svg"
+  },
+  "hero": [
+    "/assets/hero/hero-potato-fertilizers.png",
+    "/assets/hero/hero-reference-1.png",
+    "/assets/hero/hero-reference-2.png",
+    "/assets/hero/hero-reference-3.png"
+  ],
+  "products": [
+    {
+      "slug": "npk-potato",
+      "name": "Комплексное NPK для картофеля",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/npk-potato/front.png",
+        "angle": "/assets/products/npk-potato/angle.png",
+        "back": "/assets/products/npk-potato/back.png"
+      }
+    },
+    {
+      "slug": "nitroammofoska-azofoska",
+      "name": "Нитроаммофоска / азофоска NPK",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/nitroammofoska-azofoska/front.png",
+        "angle": "/assets/products/nitroammofoska-azofoska/angle.png",
+        "back": "/assets/products/nitroammofoska-azofoska/back.png"
+      }
+    },
+    {
+      "slug": "diammofoska",
+      "name": "Диаммофоска",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/diammofoska/front.png",
+        "angle": "/assets/products/diammofoska/angle.png",
+        "back": "/assets/products/diammofoska/back.png"
+      }
+    },
+    {
+      "slug": "ammofos",
+      "name": "Аммофос",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/ammofos/front.png",
+        "angle": "/assets/products/ammofos/angle.png",
+        "back": "/assets/products/ammofos/back.png"
+      }
+    },
+    {
+      "slug": "superfosfat",
+      "name": "Суперфосфат",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/superfosfat/front.png",
+        "angle": "/assets/products/superfosfat/angle.png",
+        "back": "/assets/products/superfosfat/back.png"
+      }
+    },
+    {
+      "slug": "sulfate-potassium",
+      "name": "Сульфат калия",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/sulfate-potassium/front.png",
+        "angle": "/assets/products/sulfate-potassium/angle.png",
+        "back": "/assets/products/sulfate-potassium/back.png"
+      }
+    },
+    {
+      "slug": "kalimagnesia",
+      "name": "Калимагнезия",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/kalimagnesia/front.png",
+        "angle": "/assets/products/kalimagnesia/angle.png",
+        "back": "/assets/products/kalimagnesia/back.png"
+      }
+    },
+    {
+      "slug": "monopotassium-phosphate",
+      "name": "Монофосфат калия",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/monopotassium-phosphate/front.png",
+        "angle": "/assets/products/monopotassium-phosphate/angle.png",
+        "back": "/assets/products/monopotassium-phosphate/back.png"
+      }
+    },
+    {
+      "slug": "potassium-nitrate",
+      "name": "Калиевая селитра",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/potassium-nitrate/front.png",
+        "angle": "/assets/products/potassium-nitrate/angle.png",
+        "back": "/assets/products/potassium-nitrate/back.png"
+      }
+    },
+    {
+      "slug": "ammonium-sulfate",
+      "name": "Сульфат аммония",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/ammonium-sulfate/front.png",
+        "angle": "/assets/products/ammonium-sulfate/angle.png",
+        "back": "/assets/products/ammonium-sulfate/back.png"
+      }
+    },
+    {
+      "slug": "ammonium-nitrate",
+      "name": "Аммиачная селитра",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/ammonium-nitrate/front.png",
+        "angle": "/assets/products/ammonium-nitrate/angle.png",
+        "back": "/assets/products/ammonium-nitrate/back.png"
+      }
+    },
+    {
+      "slug": "urea",
+      "name": "Карбамид / мочевина",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/urea/front.png",
+        "angle": "/assets/products/urea/angle.png",
+        "back": "/assets/products/urea/back.png"
+      }
+    },
+    {
+      "slug": "borofoska",
+      "name": "Борофоска",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/borofoska/front.png",
+        "angle": "/assets/products/borofoska/angle.png",
+        "back": "/assets/products/borofoska/back.png"
+      }
+    },
+    {
+      "slug": "dolomite-flour",
+      "name": "Доломитовая мука",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/dolomite-flour/front.png",
+        "angle": "/assets/products/dolomite-flour/angle.png",
+        "back": "/assets/products/dolomite-flour/back.png"
+      }
+    },
+    {
+      "slug": "wood-ash",
+      "name": "Древесная зола",
+      "price": 10,
+      "weight": "25 кг",
+      "images": {
+        "front": "/assets/products/wood-ash/front.png",
+        "angle": "/assets/products/wood-ash/angle.png",
+        "back": "/assets/products/wood-ash/back.png"
+      }
+    }
+  ],
+  "articles": [
+    "/assets/articles/potato-planting.jpg",
+    "/assets/articles/potato-field.jpg",
+    "/assets/articles/potato-harvest.jpg",
+    "/assets/articles/potato-deficiency.jpg",
+    "/assets/articles/article-extra-5.jpg"
+  ],
+  "notes": [
+    "Все товары разложены по slug и имеют front/angle/back.",
+    "Цена по умолчанию: 10.",
+    "Некоторые изображения содержат AI-текст на упаковке; перед финальным продакшеном лучше перепроверить подписи и формулы.",
+    "Если нужен 100% идеальный товарный пак без искажений текста, лучше использовать эти изображения как визуальный референс и собрать упаковки в Figma/Photoshop."
+  ]
+}

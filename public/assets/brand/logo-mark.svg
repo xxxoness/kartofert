@@ -1,0 +1,8 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="128" height="128" rx="30" fill="#FAF7EF"/>
+<path d="M34 92C48 69 79 69 94 92" stroke="#073B24" stroke-width="8" stroke-linecap="round"/>
+<path d="M37 72C51 55 76 55 91 72" stroke="#2E6B32" stroke-width="8" stroke-linecap="round"/>
+<circle cx="64" cy="48" r="18" fill="#C79A2C"/>
+<path d="M64 28C64 16 72 10 84 10C84 22 76 28 64 28Z" fill="#F4B400"/>
+<text x="34" y="59" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="800" fill="#073B24">KF</text>
+</svg>

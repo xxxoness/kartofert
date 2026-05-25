@@ -1,0 +1,309 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, CheckCircle2, PackageCheck, Ruler, ShoppingCart, Sprout, WalletCards } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Product } from "@/data/products";
+import { useCart } from "@/components/shop/cart-provider";
+import { useProductsStore } from "@/components/shop/product-store";
+
+type StageKey = "soil" | "planting" | "vegetation" | "tubers" | "before-harvest";
+
+type StageConfig = {
+  key: StageKey;
+  title: string;
+  description: string;
+  image: string;
+  hint: string;
+  slugs: string[];
+};
+
+const stages: StageConfig[] = [
+  {
+    key: "soil",
+    title: "Подготовка почвы",
+    description: "Улучшение структуры и плодородия почвы",
+    image: "/assets/fertilizers/decor/fertilizers-decor-shovel-soil.png",
+    hint: "На подготовке почвы важно создать базовый питательный фон и скорректировать состояние участка до посадки.",
+    slugs: ["npk-potato", "diammofoska", "superfosfat", "dolomite-flour"]
+  },
+  {
+    key: "planting",
+    title: "Посадка",
+    description: "Стартовое питание и развитие корней",
+    image: "/assets/fertilizers/decor/fertilizers-decor-potato-sprout.png",
+    hint: "При посадке выбирают стартовые составы, которые помогают картофелю пройти начало роста без перегруза.",
+    slugs: ["diammofoska", "npk-potato", "superfosfat", "ammofos"]
+  },
+  {
+    key: "vegetation",
+    title: "Вегетация",
+    description: "Рост ботвы и развитие растения",
+    image: "/assets/fertilizers/decor/fertilizers-decor-plant-soil.png",
+    hint: "В период вегетации акцент делают на росте растения и аккуратной поддержке азотного питания.",
+    slugs: ["ammonium-nitrate", "ammonium-sulfate", "potassium-nitrate", "npk-potato"]
+  },
+  {
+    key: "tubers",
+    title: "Клубнеобразование",
+    description: "Формирование клубней и их налив",
+    image: "/assets/fertilizers/decor/fertilizers-decor-potato-pile.png",
+    hint: "На этапе клубнеобразования чаще смотрят в сторону калия, магния и микроэлементов для качества клубней.",
+    slugs: ["kalimagnesia", "sulfate-potassium", "potassium-nitrate", "borofoska"]
+  },
+  {
+    key: "before-harvest",
+    title: "Перед уборкой",
+    description: "Улучшение качества и лёжкости",
+    image: "/assets/fertilizers/decor/fertilizers-decor-potato-crate.png",
+    hint: "Перед уборкой важно не перегружать посадки азотом и держать фокус на качестве и хранении урожая.",
+    slugs: ["sulfate-potassium", "kalimagnesia", "wood-ash", "monopotassium-phosphate"]
+  }
+];
+
+const fallbackPopular = ["npk-potato", "kalimagnesia", "diammofoska", "sulfate-potassium"];
+
+function productImage(slug: string) {
+  return `/assets/products/${slug}/front.png`;
+}
+
+export function FertilizersPage() {
+  const [activeStage, setActiveStage] = useState<StageKey>("planting");
+  const { products } = useProductsStore();
+  const { addItem } = useCart();
+  const selectedStage = stages.find((stage) => stage.key === activeStage) ?? stages[0];
+
+  const recommendedProducts = useMemo(() => {
+    const selected = selectedStage.slugs
+      .map((slug) => products.find((product) => product.slug === slug))
+      .filter((product): product is Product => Boolean(product));
+
+    if (selected.length >= 4) return selected.slice(0, 4);
+
+    const fallback = fallbackPopular
+      .map((slug) => products.find((product) => product.slug === slug))
+      .filter((product): product is Product => Boolean(product));
+
+    return [...selected, ...fallback.filter((product) => !selected.some((item) => item.slug === product.slug))].slice(0, 4);
+  }, [products, selectedStage]);
+
+  return (
+    <section className="overflow-hidden">
+      <div className="container-shell py-5 md:py-7">
+        <Hero />
+
+        <section className="mt-5 rounded-[28px] border border-[#173c25]/10 bg-[#fffdf8]/62 p-3.5 shadow-[0_14px_44px_rgba(45,35,17,.045)] md:p-4">
+          <StageSelector activeStage={activeStage} onChange={setActiveStage} />
+          <RecommendedProducts products={recommendedProducts} stage={selectedStage} onAdd={addItem} />
+        </section>
+
+        <HelpCta stage={selectedStage} />
+        <Benefits />
+      </div>
+    </section>
+  );
+}
+
+function Hero() {
+  return (
+    <div className="relative grid min-h-[390px] gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(520px,1.1fr)] lg:items-center">
+      <div className="relative z-10 py-4 md:py-5">
+        <span className="inline-flex rounded-[10px] bg-[#fff1be] px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-[#8c5b00]">
+          Для картофеля
+        </span>
+        <h1 className="mt-4 max-w-3xl text-[40px] font-black leading-[0.96] tracking-[-0.06em] text-[#071a10] sm:text-[54px] lg:text-[62px]">
+          Удобрения для картофеля по этапам выращивания
+        </h1>
+        <p className="mt-3 max-w-xl text-[17px] font-medium leading-7 text-[#4d5a4e]">
+          Выберите задачу — мы подскажем, какие удобрения подойдут лучше всего.
+        </p>
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <Button asChild className="h-[52px] rounded-[13px] bg-[#063b23] px-7 text-white shadow-[0_18px_40px_rgba(6,59,35,.18)] hover:bg-[#0d5a36]">
+            <Link href="/products">
+              Перейти в каталог <ArrowRight className="h-5 w-5" />
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="h-[52px] rounded-[13px] border-[#f5b400] bg-[#fffdf8] px-7 text-[#8c5b00] shadow-none hover:bg-[#fff4cf]">
+            <Link href="/calculator">Рассчитать количество</Link>
+          </Button>
+        </div>
+      </div>
+
+      <div className="relative z-10 -mx-3 min-h-[270px] lg:-mr-10 lg:ml-0 lg:min-h-[390px]">
+        <div className="pointer-events-none absolute inset-x-10 bottom-7 h-24 rounded-full bg-[#d9c59c]/28 blur-2xl" />
+        <Image
+          src="/assets/fertilizers/hero/fertilizers-hero-main.png"
+          alt="Удобрения KartoFert для картофеля"
+          width={900}
+          height={640}
+          priority
+          className="relative z-10 ml-auto h-auto max-h-[430px] w-full object-contain lg:max-h-[490px]"
+        />
+      </div>
+    </div>
+  );
+}
+
+function StageSelector({ activeStage, onChange }: { activeStage: StageKey; onChange: (stage: StageKey) => void }) {
+  return (
+    <div>
+      <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-[#8c5b00]">Быстрый подбор</p>
+          <h2 className="mt-1 text-[28px] font-black tracking-[-0.05em] text-[#102116]">Выберите этап выращивания</h2>
+        </div>
+      </div>
+
+      <div className="-mx-3 flex gap-3 overflow-x-auto px-3 pb-2 lg:mx-0 lg:grid lg:grid-cols-5 lg:overflow-visible lg:px-0 lg:pb-0">
+        {stages.map((stage) => {
+          const active = stage.key === activeStage;
+          return (
+            <button
+              key={stage.key}
+              type="button"
+              onClick={() => onChange(stage.key)}
+              className={`group min-h-[184px] min-w-[198px] rounded-[20px] border p-3 text-left shadow-[0_14px_36px_rgba(45,35,17,.045)] transition hover:-translate-y-0.5 lg:min-w-0 ${
+                active ? "border-[#063b23]/35 bg-[#f3faed]" : "border-[#173c25]/10 bg-white hover:border-[#f5b400]"
+              }`}
+            >
+              <span className="relative grid h-[88px] place-items-center overflow-hidden rounded-[16px] bg-[#fbf7ec]">
+                <Image src={stage.image} alt="" width={132} height={108} aria-hidden="true" className="pointer-events-none h-auto max-h-[78px] w-auto object-contain transition duration-300 group-hover:scale-105" />
+              </span>
+              <span className="mt-2.5 flex items-start gap-2">
+                <span className="min-w-0">
+                  <span className="block text-[15px] font-black leading-tight text-[#102116]">{stage.title}</span>
+                  <span className="mt-1 block text-[13px] font-semibold leading-5 text-[#596553]">{stage.description}</span>
+                </span>
+                {active ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#1f7a45]" /> : null}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function RecommendedProducts({ products, stage, onAdd }: { products: Product[]; stage: StageConfig; onAdd: (product: Product) => void }) {
+  return (
+    <div className="mt-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-[#8c5b00]">Рекомендации</p>
+          <h2 className="mt-1 text-2xl font-black tracking-[-0.045em] text-[#102116] md:text-[28px]">Популярные удобрения для картофеля</h2>
+          <p className="mt-1.5 max-w-3xl text-sm font-semibold leading-6 text-[#596553]">{stage.hint}</p>
+        </div>
+        <Button asChild variant="outline" className="h-10 rounded-[11px] border-[#173c25]/15 bg-white text-[#063b23] shadow-none hover:bg-[#f7f1e5]">
+          <Link href="/products">Смотреть все</Link>
+        </Button>
+      </div>
+
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {products.map((product) => (
+          <StageProductCard key={product.slug} product={product} onAdd={onAdd} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StageProductCard({ product, onAdd }: { product: Product; onAdd: (product: Product) => void }) {
+  const elements = product.elements.map((element) => element.symbol).join(", ");
+
+  return (
+    <article className="group flex h-full min-h-[342px] flex-col rounded-[20px] border border-[#173c25]/10 bg-white p-3.5 shadow-[0_14px_38px_rgba(45,35,17,.055)] transition hover:-translate-y-1 hover:shadow-[0_22px_52px_rgba(45,35,17,.09)]">
+      <Link href={`/products/${product.slug}`} className="block">
+        <div className="relative h-[148px] rounded-[17px] bg-[#f8f3e7]">
+          <Image
+            src={productImage(product.slug)}
+            alt={product.name}
+            fill
+            sizes="260px"
+            className="object-contain p-2 transition duration-300 group-hover:-translate-y-1"
+          />
+        </div>
+        <div className="mt-3">
+          <span className="rounded-full bg-[#eef6e9] px-2.5 py-1 text-[11px] font-black text-[#063b23]">{product.category}</span>
+          <h3 className="mt-2 line-clamp-2 min-h-[38px] text-base font-black leading-tight text-[#102116]">{product.name}</h3>
+          <p className="mt-1 text-sm font-bold text-[#65705e]">{elements}</p>
+          <p className="mt-1 text-sm font-semibold text-[#7a8373]">{product.packageSize}</p>
+        </div>
+      </Link>
+      <div className="mt-auto flex items-center justify-between gap-2.5 pt-3">
+        <div className="min-w-[66px]">
+          <p className="text-xl font-black tracking-[-0.04em] text-[#102116]">{product.price ?? 10} ₽</p>
+          <p className="text-[11px] font-semibold text-[#7a8373]">за мешок</p>
+        </div>
+        <div className="flex min-w-0 gap-2">
+          <Button asChild variant="outline" className="h-10 rounded-[11px] border-[#063b23]/25 bg-white px-3 text-xs font-black text-[#063b23] shadow-none hover:bg-[#f3faed]">
+            <Link href={`/products/${product.slug}`}>Подробнее</Link>
+          </Button>
+          <Button
+            type="button"
+            onClick={() => onAdd(product)}
+            className="h-10 w-10 shrink-0 rounded-[11px] bg-[#063b23] p-0 text-white shadow-none hover:bg-[#0d5a36]"
+            aria-label={`Добавить в корзину ${product.name}`}
+          >
+            <ShoppingCart className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function HelpCta({ stage }: { stage: StageConfig }) {
+  return (
+    <section className="relative mt-5 overflow-hidden rounded-[24px] border border-[#173c25]/10 bg-[#fffdf8] p-4 shadow-[0_12px_36px_rgba(45,35,17,.045)] md:p-5">
+      <Image
+        src="/assets/fertilizers/decor/fertilizers-decor-potato-crate.png"
+        alt=""
+        width={220}
+        height={160}
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-6 bottom-0 hidden h-auto w-32 opacity-50 md:block"
+      />
+      <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="max-w-2xl">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-[#8c5b00]">Подбор по этапу: {stage.title}</p>
+          <h2 className="mt-1 text-2xl font-black tracking-[-0.04em] text-[#102116]">Не знаете, что выбрать?</h2>
+          <p className="mt-1.5 text-sm font-semibold leading-6 text-[#596553]">
+            Рассчитайте оптимальную схему питания под вашу задачу и получите точный результат.
+          </p>
+        </div>
+        <Button asChild className="h-11 rounded-[12px] bg-[#f5b400] px-6 text-[#1b1500] shadow-none hover:bg-[#e8a900]">
+          <Link href="/calculator">
+            Перейти в калькулятор <ArrowRight className="h-5 w-5" />
+          </Link>
+        </Button>
+      </div>
+    </section>
+  );
+}
+
+function Benefits() {
+  const items = [
+    { icon: PackageCheck, title: "Качество и эффективность", text: "Проверенные удобрения" },
+    { icon: Ruler, title: "Точная дозировка", text: "Под вашу задачу" },
+    { icon: WalletCards, title: "Экономия времени и денег", text: "Правильный выбор с первого раза" },
+    { icon: Sprout, title: "Поддержка агронома", text: "Поможем с подбором" }
+  ];
+
+  return (
+    <section className="mt-5 grid gap-3 rounded-[22px] border border-[#173c25]/10 bg-white/72 p-3.5 shadow-[0_14px_42px_rgba(45,35,17,.05)] sm:grid-cols-2 lg:grid-cols-4">
+      {items.map((item) => (
+        <div key={item.title} className="flex items-center gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[14px] bg-[#fff1be] text-[#063b23]">
+            <item.icon className="h-5 w-5" />
+          </span>
+          <span>
+            <span className="block text-sm font-black text-[#102116]">{item.title}</span>
+            <span className="block text-xs font-semibold text-[#65705e]">{item.text}</span>
+          </span>
+        </div>
+      ))}
+    </section>
+  );
+}

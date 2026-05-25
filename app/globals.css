@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Segoe UI", Arial, sans-serif;
+  --color-background: #f7f3ea;
+  --color-foreground: #182019;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(122, 161, 91, 0.24), transparent 32rem),
+    radial-gradient(circle at 90% 8%, rgba(220, 160, 71, 0.18), transparent 30rem),
+    linear-gradient(180deg, #fbf8f1 0%, #f5efe2 44%, #edf3e8 100%);
+  color: #182019;
+  font-family: var(--font-sans);
+  letter-spacing: 0;
+  overflow-x: hidden;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.container-shell {
+  width: min(1240px, calc(100% - 32px));
+  margin-inline: auto;
+}
+
+.shop-card {
+  border: 1px solid rgba(46, 64, 43, 0.1);
+  background: rgba(255, 253, 247, 0.82);
+  box-shadow: 0 18px 50px rgba(53, 43, 24, 0.08);
+}
+
+.field-pattern {
+  position: relative;
+  overflow: hidden;
+}
+
+.field-pattern::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.14;
+  background-image:
+    linear-gradient(120deg, rgba(48, 83, 58, 0.22) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(140, 103, 48, 0.16) 1px, transparent 1px);
+  background-size: 28px 28px, 46px 46px;
+}
+
+.dark-panel {
+  background:
+    radial-gradient(circle at 78% 10%, rgba(163, 206, 113, 0.2), transparent 22rem),
+    linear-gradient(135deg, #162319 0%, #223320 56%, #75613a 140%);
+  color: #fffdf7;
+}
+
+.store-shelf {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.42)),
+    repeating-linear-gradient(0deg, transparent 0, transparent 116px, rgba(62, 71, 50, 0.08) 117px, transparent 119px);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  box-shadow: 0 0 0 3px rgba(70, 130, 74, 0.28);
+}
+
+.field-input {
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(23, 60, 37, 0.1);
+  background: #ffffff;
+  padding: 0 16px;
+  color: #102116;
+  font-weight: 600;
+  outline: none;
+}
+
+.field-input:focus {
+  border-color: #f5b400;
+  box-shadow: 0 0 0 4px rgba(245, 180, 0, 0.18);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (max-width: 640px) {
+  .container-shell {
+    width: min(100% - 24px, 1180px);
+  }
+}
