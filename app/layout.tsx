@@ -8,6 +8,8 @@ import { ProductsProvider } from "@/components/shop/product-store";
 import { getPublishedProducts } from "@/lib/products";
 import { siteUrl } from "@/lib/site-url";
 
+const ogImageUrl = `${siteUrl}/og-image.jpg`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   alternates: {
@@ -32,7 +34,26 @@ export const metadata: Metadata = {
     url: siteUrl,
     siteName: siteConfig.brandName,
     locale: "ru_BY",
-    type: "website"
+    type: "website",
+    images: [
+      {
+        url: ogImageUrl,
+        width: 1200,
+        height: 630,
+        alt: "KartoFert — удобрения для картофеля"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${siteConfig.brandName} — удобрения для картофеля`,
+    description: siteConfig.siteDescription,
+    images: [
+      {
+        url: ogImageUrl,
+        alt: "KartoFert — удобрения для картофеля"
+      }
+    ]
   }
 };
 
