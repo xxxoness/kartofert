@@ -1,68 +1,45 @@
-"use client";
-
-import { FormEvent, ReactElement, cloneElement, useState } from "react";
-import { useRouter } from "next/navigation";
 import { AdminLayout } from "@/components/admin/admin-layout";
-import { AdminArticle, readAdminArticles, saveAdminArticles } from "@/components/admin/admin-articles-table";
-import { Button } from "@/components/ui/button";
+import { requireAdmin } from "@/lib/admin-auth";
 
-export default function NewAdminArticlePage() {
-  const router = useRouter();
-  const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
-  const [category, setCategory] = useState("Картофель");
-  const [excerpt, setExcerpt] = useState("");
-  const [content, setContent] = useState("");
-  const [status, setStatus] = useState<AdminArticle["status"]>("черновик");
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    const next: AdminArticle = {
-      title,
-      slug: slug || title.toLowerCase().replaceAll(" ", "-"),
-      category,
-      excerpt,
-      content,
-      status
-    };
-    saveAdminArticles([next, ...readAdminArticles()]);
-    router.push("/admin/articles");
-  };
+export default async function NewAdminArticlePage() {
+  const admin = await requireAdmin();
 
   return (
-    <AdminLayout>
-      <form onSubmit={submit} className="grid gap-5 rounded-[16px] border border-[#173c25]/10 bg-white p-5 shadow-[0_12px_32px_rgba(45,35,17,.05)]">
-        <h2 className="text-2xl font-black tracking-[-0.04em] text-[#102116]">Новая статья</h2>
+    <AdminLayout active="articles" title="Новая статья" description="UI-заготовка редактора. Публикация будет сохраняться после подключения базы данных." adminEmail={admin.email}>
+      <form className="grid gap-5 rounded-[22px] border border-[#173c25]/10 bg-white p-6 shadow-[0_16px_42px_rgba(45,35,17,.06)]">
         <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Заголовок"><input required value={title} onChange={(event) => setTitle(event.target.value)} /></Field>
-          <Field label="Slug"><input value={slug} onChange={(event) => setSlug(event.target.value)} placeholder="primer-stati" /></Field>
-          <Field label="Категория"><input value={category} onChange={(event) => setCategory(event.target.value)} /></Field>
-          <Field label="Краткое описание"><input value={excerpt} onChange={(event) => setExcerpt(event.target.value)} /></Field>
+          <Field label="Заголовок" />
+          <Field label="Slug" />
+          <Field label="Категория" />
+          <Field label="Обложка" />
+          <Field label="SEO title" />
+          <Field label="SEO description" />
         </div>
         <label className="grid gap-2 text-sm font-black text-[#243427]">
-          Контент
-          <textarea required value={content} onChange={(event) => setContent(event.target.value)} className="min-h-56 rounded-[12px] border border-[#173c25]/10 px-4 py-3 font-semibold outline-none focus:border-[#f5b400]" />
+          Краткое описание
+          <textarea className="min-h-24 rounded-[14px] border border-[#173c25]/10 bg-[#fffdf8] px-4 py-3 font-semibold outline-none focus:border-[#f5b400]" />
         </label>
-        <label className="grid gap-2 text-sm font-black text-[#243427] md:max-w-xs">
-          Статус
-          <select value={status} onChange={(event) => setStatus(event.target.value as AdminArticle["status"])} className="h-12 rounded-[12px] border border-[#173c25]/10 px-4 font-bold outline-none focus:border-[#f5b400]">
-            <option value="черновик">Черновик</option>
-            <option value="опубликовано">Опубликовано</option>
+        <label className="grid gap-2 text-sm font-black text-[#243427]">
+          Content / Markdown
+          <textarea className="min-h-64 rounded-[14px] border border-[#173c25]/10 bg-[#fffdf8] px-4 py-3 font-semibold outline-none focus:border-[#f5b400]" />
+        </label>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <select className="h-12 rounded-[14px] border border-[#173c25]/10 bg-[#fffdf8] px-4 font-bold outline-none focus:border-[#f5b400] md:w-[260px]">
+            <option value="draft">Черновик</option>
+            <option value="published">Опубликовано</option>
           </select>
-        </label>
-        <Button className="h-12 w-fit rounded-[10px] bg-[#063b23] px-8 text-white hover:bg-[#0d5a36]">Сохранить статью</Button>
+          <button className="h-12 rounded-[14px] bg-[#063b23] px-7 text-sm font-black text-white transition hover:bg-[#0d5a36]">Сохранить статью</button>
+        </div>
       </form>
     </AdminLayout>
   );
 }
 
-function Field({ label, children }: { label: string; children: ReactElement<{ className?: string }> }) {
+function Field({ label }: { label: string }) {
   return (
     <label className="grid gap-2 text-sm font-black text-[#243427]">
       {label}
-      {cloneElement(children, {
-        className: "h-12 rounded-[12px] border border-[#173c25]/10 px-4 font-semibold outline-none focus:border-[#f5b400]"
-      })}
+      <input className="h-12 rounded-[14px] border border-[#173c25]/10 bg-[#fffdf8] px-4 font-semibold outline-none focus:border-[#f5b400]" />
     </label>
   );
 }

@@ -1,10 +1,5 @@
-import { AdminLayout } from "@/components/admin/admin-layout";
-import { AdminLeadsTable } from "@/components/admin/admin-leads-table";
+import { redirect } from "next/navigation";
 
 export default function AdminLeadsPage() {
-  return (
-    <AdminLayout>
-      <AdminLeadsTable />
-    </AdminLayout>
-  );
+  redirect("/admin/orders");
 }
