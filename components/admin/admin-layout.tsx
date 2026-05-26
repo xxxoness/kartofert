@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { logoutAdmin } from "@/app/admin/login/actions";
 import { Logo } from "@/components/shop/logo";
+import { getDatabaseStatus } from "@/lib/db";
 import { cn } from "@/lib/utils";
 
 type AdminSection = "dashboard" | "products" | "orders" | "articles" | "analytics" | "settings" | "logs";
@@ -42,6 +43,8 @@ export function AdminLayout({
   description?: string;
   adminEmail: string;
 }) {
+  const databaseStatus = getDatabaseStatus();
+
   return (
     <section className="min-h-screen bg-[#f6f1e7] px-4 py-5 text-[#102116] md:px-6">
       <div className="mx-auto grid min-h-[calc(100vh-40px)] max-w-[1500px] overflow-hidden rounded-[28px] border border-[#173c25]/10 bg-white shadow-[0_28px_80px_rgba(45,35,17,.12)] lg:grid-cols-[290px_1fr]">
@@ -111,7 +114,14 @@ export function AdminLayout({
             </div>
           </header>
 
-          <div className="p-5 md:p-7">{children}</div>
+          <div className="p-5 md:p-7">
+            {!databaseStatus.connected ? (
+              <div className="mb-5 rounded-[18px] border border-[#f5b400]/35 bg-[#fff7d7] px-5 py-4 text-sm font-bold leading-6 text-[#6d4b00]">
+                {databaseStatus.message}
+              </div>
+            ) : null}
+            {children}
+          </div>
         </main>
       </div>
     </section>

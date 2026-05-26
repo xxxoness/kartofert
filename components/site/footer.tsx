@@ -76,6 +76,11 @@ export async function Footer() {
         <div className="mt-9 flex flex-col gap-3 border-t border-[#173c25]/10 pt-5 text-xs font-semibold text-[#6d7468] md:flex-row md:items-center md:justify-between">
           <p>© 2026 KartoFert. Интернет-магазин удобрений для картофеля.</p>
           <div className="flex flex-wrap gap-4">
+            <Link href="/policy" className="hover:text-[#063b23]">Политика обработки персональных данных</Link>
+            <Link href="/cookie" className="hover:text-[#063b23]">Политика cookie</Link>
+            <Link href="/terms" className="hover:text-[#063b23]">Условия заказа и продажи</Link>
+            <Link href="/returns" className="hover:text-[#063b23]">Возврат и обмен</Link>
+            <Link href="/documents" className="hover:text-[#063b23]">Документы на продукцию</Link>
             <Link href="/faq" className="hover:text-[#063b23]">Вопросы и ответы</Link>
             <Link href="/delivery" className="hover:text-[#063b23]">Условия доставки</Link>
             <Link href="/contacts" className="hover:text-[#063b23]">Связаться с нами</Link>

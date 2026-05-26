@@ -108,9 +108,14 @@ export function ContactsPage() {
     const phone = String(form.get("phone") ?? "");
     const subject = String(form.get("subject") ?? "");
     const message = String(form.get("message") ?? "");
+    const privacyAccepted = form.get("privacy") === "on";
 
     if (name.trim().length < 2 || !email.includes("@") || subject.trim().length < 2 || message.trim().length < 8) {
       setError("Заполните имя, e-mail, тему обращения и сообщение.");
+      return;
+    }
+    if (!privacyAccepted) {
+      setError("Подтвердите согласие на обработку персональных данных.");
       return;
     }
 
@@ -202,6 +207,20 @@ export function ContactsPage() {
                     ))}
                   </select>
                   <textarea name="message" aria-label="Сообщение" placeholder="Сообщение *" className="min-h-[150px] resize-none rounded-[14px] border border-[#173c25]/10 bg-white px-5 py-4 text-base font-semibold text-[#102116] outline-none transition placeholder:text-[#7d8777] focus:border-[#f5b400] focus:ring-4 focus:ring-[#f5b400]/20" />
+                  <label className="flex gap-3 rounded-[14px] border border-[#173c25]/10 bg-[#fffdf8] p-4 text-sm font-semibold leading-6 text-[#4f5d50]">
+                    <input name="privacy" type="checkbox" required className="mt-1 h-4 w-4 shrink-0 accent-[#063b23]" />
+                    <span>
+                      Я соглашаюсь на обработку персональных данных и ознакомлен(а) с{" "}
+                      <Link href="/policy" className="font-black text-[#063b23] underline">
+                        Политикой обработки персональных данных
+                      </Link>{" "}
+                      и{" "}
+                      <Link href="/terms" className="font-black text-[#063b23] underline">
+                        Условиями заказа и продажи
+                      </Link>
+                      .
+                    </span>
+                  </label>
                   {error ? <p className="rounded-[12px] bg-[#fff1e8] px-4 py-3 text-sm font-bold text-[#8c3d22]">{error}</p> : null}
                   <Button type="submit" className="h-14 w-full rounded-[13px] bg-[#063b23] text-base font-black text-white hover:bg-[#0d5a36] md:w-fit md:px-8 [&_*]:text-white" style={{ color: "#fff" }}>
                     Отправить сообщение

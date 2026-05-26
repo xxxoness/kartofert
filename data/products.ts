@@ -59,7 +59,6 @@ const base = {
   brand: "KartoFert",
   packageSize: "25 кг",
   bagWeight: 25,
-  price: 10,
   inStock: true,
   crops: ["Картофель"]
 };
@@ -546,6 +545,6 @@ export function findProduct(slug: string) {
 }
 
 export function formatProductPrice(product: Pick<Product, "price">) {
-  if (typeof product.price !== "number") return "Цена по запросу";
-  return `${product.price.toLocaleString("ru-RU")} ₽`;
+  if (typeof product.price !== "number") return "Цена уточняется";
+  return `${product.price.toLocaleString("ru-RU")} BYN`;
 }

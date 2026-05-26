@@ -5,7 +5,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 
 export default async function AdminAnalyticsPage() {
   const admin = await requireAdmin();
-  const analytics = getAnalyticsSummary();
+  const analytics = await getAnalyticsSummary();
 
   return (
     <AdminLayout active="analytics" title="Аналитика" description="Каркас для событий, просмотров, конверсий и ошибок." adminEmail={admin.email}>

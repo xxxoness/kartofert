@@ -1,4 +1,5 @@
 import { prisma, withDatabase } from "@/lib/db";
+import { createSupabaseAdminClient, hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 import { siteConfig } from "@/config/site";
 
 export type SiteSettingsValue = {
@@ -26,6 +27,17 @@ export const defaultSiteSettings: SiteSettingsValue = {
 };
 
 export async function getSiteSettings() {
+  if (hasSupabaseAdminEnv) {
+    try {
+      const supabase = createSupabaseAdminClient();
+      const { data, error } = await supabase.from("site_settings").select("value").eq("key", "site").maybeSingle();
+      if (error) throw error;
+      return data?.value && typeof data.value === "object" ? ({ ...defaultSiteSettings, ...(data.value as object) } as SiteSettingsValue) : defaultSiteSettings;
+    } catch (error) {
+      console.error("[supabase settings]", error);
+    }
+  }
+
   return withDatabase(
     async () => {
       const row = await prisma.siteSettings.findUnique({ where: { key: "site" } });
@@ -36,5 +48,16 @@ export async function getSiteSettings() {
 }
 
 export async function getSetting(key: string) {
+  if (hasSupabaseAdminEnv) {
+    try {
+      const supabase = createSupabaseAdminClient();
+      const { data, error } = await supabase.from("site_settings").select("*").eq("key", key).maybeSingle();
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("[supabase setting]", error);
+    }
+  }
+
   return withDatabase(async () => prisma.siteSettings.findUnique({ where: { key } }), null);
 }

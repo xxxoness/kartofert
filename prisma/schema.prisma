@@ -39,6 +39,8 @@ model Product {
   legacy          Json?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@map("products")
 }
 
 model Article {
@@ -58,6 +60,8 @@ model Article {
   legacy         Json?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  @@map("articles")
 }
 
 model Order {
@@ -76,6 +80,8 @@ model Order {
   paymentStatus   String   @default("pending")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@map("orders")
 }
 
 model SiteSettings {
@@ -84,6 +90,8 @@ model SiteSettings {
   value     Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
 }
 
 model AdminLog {
@@ -94,4 +102,18 @@ model AdminLog {
   message    String?
   metadata   Json?
   createdAt  DateTime @default(now())
+
+  @@map("admin_logs")
+}
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  eventName  String
+  entityType String?
+  entityId   String?
+  path       String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@map("analytics_events")
 }

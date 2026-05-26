@@ -22,6 +22,7 @@ type ProductFormRow = {
   price?: { toString(): string } | number | null;
   currency?: string;
   priceMode?: string;
+  priceLabel?: string | null;
   stockStatus?: string;
   stockQty?: number | null;
   isPublished?: boolean;
@@ -57,6 +58,7 @@ export function ProductForm({ product }: { product?: ProductFormRow | null }) {
 
       <div className="grid gap-4 lg:grid-cols-4">
         <Field label="Цена" name="price" type="number" step="0.01" defaultValue={product?.price?.toString() ?? ""} />
+        <Field label="Подпись цены" name="priceLabel" defaultValue={product?.priceLabel ?? ""} />
         <Field label="Валюта" name="currency" defaultValue={product?.currency ?? "BYN"} />
         <Select label="Режим цены" name="priceMode" defaultValue={product?.priceMode ?? "request"} options={[["request", "Цена уточняется"], ["exact", "Точная цена"], ["from", "От цены"]]} />
         <Field label="Вес мешка, кг" name="packageWeightKg" type="number" step="0.1" defaultValue={String(product?.packageWeightKg ?? 25)} />

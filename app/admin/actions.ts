@@ -6,10 +6,11 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/admin-auth";
 import { createAdminLog } from "@/lib/admin-logs";
 import { hasDatabaseUrl, prisma } from "@/lib/db";
+import { createSupabaseAdminClient, hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 
-function ensureDb() {
-  if (!hasDatabaseUrl) {
-    throw new Error("DATABASE_URL не задан. Сохранение будет доступно после подключения PostgreSQL.");
+function ensureStorage() {
+  if (!hasSupabaseAdminEnv && !hasDatabaseUrl) {
+    throw new Error("База данных не подключена. Добавьте Supabase env или DATABASE_URL.");
   }
 }
 
@@ -38,6 +39,14 @@ function jsonValue(formData: FormData, key: string) {
   } catch {
     return value;
   }
+}
+
+function arrayFromText(value: string | null) {
+  if (!value) return [];
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 function productPayload(formData: FormData) {
@@ -74,9 +83,51 @@ function productPayload(formData: FormData) {
   };
 }
 
+function productPayloadSupabase(formData: FormData) {
+  const payload = productPayload(formData);
+  const customPriceLabel = nullableText(formData, "priceLabel");
+  const priceLabel = customPriceLabel ?? (payload.price == null ? "Цена уточняется" : `${payload.price} ${payload.currency}`);
+
+  return {
+    title: payload.title,
+    slug: payload.slug,
+    short_description: payload.shortDescription,
+    description: payload.description,
+    category: payload.category,
+    nutrients: Array.isArray(payload.nutrients) ? payload.nutrients : arrayFromText(text(formData, "nutrients")),
+    growing_stages: arrayFromText(payload.stage),
+    price: payload.price,
+    price_label: priceLabel,
+    price_mode: payload.priceMode,
+    currency: payload.currency,
+    package_weight: `${payload.packageWeightKg} кг`,
+    image_url: payload.image,
+    images: payload.images === Prisma.JsonNull ? [] : payload.images,
+    is_published: payload.isPublished,
+    in_stock: payload.stockStatus !== "out_of_stock",
+    sort_order: payload.sortOrder,
+    updated_at: new Date().toISOString()
+  };
+}
+
 export async function createProductAction(formData: FormData) {
   const admin = await requireAdmin();
-  ensureDb();
+  ensureStorage();
+
+  if (hasSupabaseAdminEnv) {
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase.from("products").insert(productPayloadSupabase(formData)).select("*").single();
+    if (error) throw new Error(error.message);
+
+    await createAdminLog({
+      action: "product.create",
+      entityType: "product",
+      entityId: data.id,
+      message: `${admin.email} создал товар ${data.title}`
+    });
+    revalidateProductPaths(data.slug);
+    redirect("/admin/products");
+  }
 
   const product = await prisma.product.create({ data: productPayload(formData) });
   await createAdminLog({
@@ -85,16 +136,30 @@ export async function createProductAction(formData: FormData) {
     entityId: product.id,
     message: `${admin.email} создал товар ${product.title}`
   });
-
-  revalidatePath("/products");
-  revalidatePath(`/products/${product.slug}`);
-  revalidatePath("/admin/products");
+  revalidateProductPaths(product.slug);
   redirect("/admin/products");
 }
 
 export async function updateProductAction(id: string, formData: FormData) {
   const admin = await requireAdmin();
-  ensureDb();
+  ensureStorage();
+
+  if (hasSupabaseAdminEnv) {
+    const supabase = createSupabaseAdminClient();
+    const { data: previous } = await supabase.from("products").select("*").eq("id", id).maybeSingle();
+    const { data, error } = await supabase.from("products").update(productPayloadSupabase(formData)).eq("id", id).select("*").single();
+    if (error) throw new Error(error.message);
+
+    await createAdminLog({
+      action: previous?.price !== data.price ? "product.price_update" : "product.update",
+      entityType: "product",
+      entityId: data.id,
+      message: `${admin.email} изменил товар ${data.title}`,
+      metadata: { previousSlug: previous?.slug, newSlug: data.slug }
+    });
+    revalidateProductPaths(data.slug, previous?.slug);
+    redirect("/admin/products");
+  }
 
   const previous = await prisma.product.findUnique({ where: { id } });
   const product = await prisma.product.update({ where: { id }, data: productPayload(formData) });
@@ -105,17 +170,35 @@ export async function updateProductAction(id: string, formData: FormData) {
     message: `${admin.email} изменил товар ${product.title}`,
     metadata: { previousSlug: previous?.slug, newSlug: product.slug }
   });
-
-  revalidatePath("/products");
-  revalidatePath(`/products/${product.slug}`);
-  if (previous?.slug && previous.slug !== product.slug) revalidatePath(`/products/${previous.slug}`);
-  revalidatePath("/admin/products");
+  revalidateProductPaths(product.slug, previous?.slug);
   redirect("/admin/products");
 }
 
 export async function toggleProductPublishedAction(id: string) {
   const admin = await requireAdmin();
-  ensureDb();
+  ensureStorage();
+
+  if (hasSupabaseAdminEnv) {
+    const supabase = createSupabaseAdminClient();
+    const { data: product, error: readError } = await supabase.from("products").select("*").eq("id", id).single();
+    if (readError) throw new Error(readError.message);
+    const { data: next, error } = await supabase
+      .from("products")
+      .update({ is_published: !product.is_published, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select("*")
+      .single();
+    if (error) throw new Error(error.message);
+
+    await createAdminLog({
+      action: next.is_published ? "product.publish" : "product.unpublish",
+      entityType: "product",
+      entityId: id,
+      message: `${admin.email} ${next.is_published ? "опубликовал" : "скрыл"} товар ${next.title}`
+    });
+    revalidateProductPaths(next.slug);
+    return;
+  }
 
   const product = await prisma.product.findUniqueOrThrow({ where: { id } });
   const next = await prisma.product.update({ where: { id }, data: { isPublished: !product.isPublished } });
@@ -125,10 +208,7 @@ export async function toggleProductPublishedAction(id: string) {
     entityId: id,
     message: `${admin.email} ${next.isPublished ? "опубликовал" : "скрыл"} товар ${next.title}`
   });
-
-  revalidatePath("/products");
-  revalidatePath(`/products/${next.slug}`);
-  revalidatePath("/admin/products");
+  revalidateProductPaths(next.slug);
 }
 
 function articlePayload(formData: FormData) {
@@ -150,27 +230,63 @@ function articlePayload(formData: FormData) {
   };
 }
 
+function articlePayloadSupabase(formData: FormData) {
+  const payload = articlePayload(formData);
+  return {
+    title: payload.title,
+    slug: payload.slug,
+    excerpt: payload.excerpt,
+    content: payload.content,
+    category: payload.category,
+    cover_image_url: payload.coverImage,
+    read_time: payload.readTime,
+    published_at: payload.publishedAt?.toISOString() ?? null,
+    status: payload.status,
+    is_featured: payload.isFeatured,
+    seo_title: payload.seoTitle,
+    seo_description: payload.seoDescription,
+    updated_at: new Date().toISOString()
+  };
+}
+
 export async function createArticleAction(formData: FormData) {
   const admin = await requireAdmin();
-  ensureDb();
+  ensureStorage();
+
+  if (hasSupabaseAdminEnv) {
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase.from("articles").insert(articlePayloadSupabase(formData)).select("*").single();
+    if (error) throw new Error(error.message);
+    await createAdminLog({ action: "article.create", entityType: "article", entityId: data.id, message: `${admin.email} создал статью ${data.title}` });
+    revalidateArticlePaths(data.slug);
+    redirect("/admin/articles");
+  }
 
   const article = await prisma.article.create({ data: articlePayload(formData) });
-  await createAdminLog({
-    action: "article.create",
-    entityType: "article",
-    entityId: article.id,
-    message: `${admin.email} создал статью ${article.title}`
-  });
-
-  revalidatePath("/knowledge");
-  revalidatePath(`/knowledge/${article.slug}`);
-  revalidatePath("/admin/articles");
+  await createAdminLog({ action: "article.create", entityType: "article", entityId: article.id, message: `${admin.email} создал статью ${article.title}` });
+  revalidateArticlePaths(article.slug);
   redirect("/admin/articles");
 }
 
 export async function updateArticleAction(id: string, formData: FormData) {
   const admin = await requireAdmin();
-  ensureDb();
+  ensureStorage();
+
+  if (hasSupabaseAdminEnv) {
+    const supabase = createSupabaseAdminClient();
+    const { data: previous } = await supabase.from("articles").select("*").eq("id", id).maybeSingle();
+    const { data, error } = await supabase.from("articles").update(articlePayloadSupabase(formData)).eq("id", id).select("*").single();
+    if (error) throw new Error(error.message);
+    await createAdminLog({
+      action: "article.update",
+      entityType: "article",
+      entityId: data.id,
+      message: `${admin.email} изменил статью ${data.title}`,
+      metadata: { previousSlug: previous?.slug, newSlug: data.slug, status: data.status }
+    });
+    revalidateArticlePaths(data.slug, previous?.slug);
+    redirect("/admin/articles");
+  }
 
   const previous = await prisma.article.findUnique({ where: { id } });
   const article = await prisma.article.update({ where: { id }, data: articlePayload(formData) });
@@ -181,51 +297,64 @@ export async function updateArticleAction(id: string, formData: FormData) {
     message: `${admin.email} изменил статью ${article.title}`,
     metadata: { previousSlug: previous?.slug, newSlug: article.slug, status: article.status }
   });
-
-  revalidatePath("/knowledge");
-  revalidatePath(`/knowledge/${article.slug}`);
-  if (previous?.slug && previous.slug !== article.slug) revalidatePath(`/knowledge/${previous.slug}`);
-  revalidatePath("/admin/articles");
+  revalidateArticlePaths(article.slug, previous?.slug);
   redirect("/admin/articles");
 }
 
 export async function updateSettingsAction(formData: FormData) {
   const admin = await requireAdmin();
-  ensureDb();
+  ensureStorage();
 
   const value = {
     phone: text(formData, "phone"),
     email: text(formData, "email"),
     city: text(formData, "city"),
+    cityDelivery: text(formData, "city"),
     footerText: text(formData, "footerText"),
     currency: text(formData, "currency") || "BYN",
     showPrices: formData.get("showPrices") === "on",
     enableOnlinePayment: formData.get("enableOnlinePayment") === "on",
+    onlinePaymentEnabled: formData.get("enableOnlinePayment") === "on",
     mainCtaText: text(formData, "mainCtaText"),
+    mainCta: text(formData, "mainCtaText"),
     deliveryText: text(formData, "deliveryText")
   };
 
-  await prisma.siteSettings.upsert({
-    where: { key: "site" },
-    create: { key: "site", value },
-    update: { value }
-  });
-  await createAdminLog({
-    action: "settings.update",
-    entityType: "settings",
-    entityId: "site",
-    message: `${admin.email} изменил настройки сайта`
-  });
+  if (hasSupabaseAdminEnv) {
+    const supabase = createSupabaseAdminClient();
+    const { error } = await supabase.from("site_settings").upsert({ key: "site", value, updated_at: new Date().toISOString() }, { onConflict: "key" });
+    if (error) throw new Error(error.message);
+    await createAdminLog({ action: "settings.update", entityType: "settings", entityId: "site", message: `${admin.email} изменил настройки сайта` });
+    revalidatePath("/");
+    revalidatePath("/admin/settings");
+    return;
+  }
 
+  await prisma.siteSettings.upsert({ where: { key: "site" }, create: { key: "site", value }, update: { value } });
+  await createAdminLog({ action: "settings.update", entityType: "settings", entityId: "site", message: `${admin.email} изменил настройки сайта` });
   revalidatePath("/");
   revalidatePath("/admin/settings");
 }
 
 export async function updateOrderStatusAction(id: string, formData: FormData) {
   const admin = await requireAdmin();
-  ensureDb();
+  ensureStorage();
 
   const status = text(formData, "status");
+  if (hasSupabaseAdminEnv) {
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase.from("orders").update({ status, updated_at: new Date().toISOString() }).eq("id", id).select("*").single();
+    if (error) throw new Error(error.message);
+    await createAdminLog({
+      action: "order.status_update",
+      entityType: "order",
+      entityId: id,
+      message: `${admin.email} изменил статус заказа ${data.order_number ?? data.orderNumber ?? id} на ${status}`
+    });
+    revalidatePath("/admin/orders");
+    return;
+  }
+
   const order = await prisma.order.update({ where: { id }, data: { status } });
   await createAdminLog({
     action: "order.status_update",
@@ -233,6 +362,22 @@ export async function updateOrderStatusAction(id: string, formData: FormData) {
     entityId: id,
     message: `${admin.email} изменил статус заказа ${order.orderNumber} на ${status}`
   });
-
   revalidatePath("/admin/orders");
+}
+
+function revalidateProductPaths(slug: string, previousSlug?: string) {
+  revalidatePath("/");
+  revalidatePath("/products");
+  revalidatePath("/catalog");
+  revalidatePath("/potato");
+  revalidatePath(`/products/${slug}`);
+  if (previousSlug && previousSlug !== slug) revalidatePath(`/products/${previousSlug}`);
+  revalidatePath("/admin/products");
+}
+
+function revalidateArticlePaths(slug: string, previousSlug?: string) {
+  revalidatePath("/knowledge");
+  revalidatePath(`/knowledge/${slug}`);
+  if (previousSlug && previousSlug !== slug) revalidatePath(`/knowledge/${previousSlug}`);
+  revalidatePath("/admin/articles");
 }

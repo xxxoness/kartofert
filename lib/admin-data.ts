@@ -54,7 +54,7 @@ export async function getOrdersForAdmin() {
   return getOrders();
 }
 
-export function getAnalyticsSummary() {
+export async function getAnalyticsSummary() {
   return readAnalyticsSummary();
 }
 

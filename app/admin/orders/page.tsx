@@ -11,7 +11,8 @@ const statuses = [
   { value: "paid", label: "Оплачен" },
   { value: "shipped", label: "Отправлен" },
   { value: "completed", label: "Завершён" },
-  { value: "cancelled", label: "Отменён" }
+  { value: "cancelled", label: "Отменён" },
+  { value: "return_dispute", label: "Возврат/спор" }
 ];
 
 function formatMoney(value: unknown, currency = "BYN") {
