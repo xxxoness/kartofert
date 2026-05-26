@@ -7,6 +7,7 @@ import { ArrowRight, CheckCircle2, ChevronRight, Clock, Headphones, Lock, Mail, 
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { addLead } from "@/components/shop/leads-store";
+import { trackAnalyticsEvent } from "@/components/site/analytics-tracker";
 
 const contactItems = [
   {
@@ -127,6 +128,11 @@ export function ContactsPage() {
       productName: subject,
       amount: "",
       comment: message
+    });
+    trackAnalyticsEvent({
+      eventName: "contact_form_submit",
+      path: "/contacts",
+      payload: { subject }
     });
     setError("");
     setSent(true);

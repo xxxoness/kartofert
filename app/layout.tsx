@@ -8,6 +8,7 @@ import { ProductsProvider } from "@/components/shop/product-store";
 import { getPublishedProducts } from "@/lib/products";
 import { siteUrl } from "@/lib/site-url";
 import { CookieConsent } from "@/components/site/cookie-consent";
+import { AnalyticsTracker } from "@/components/site/analytics-tracker";
 
 const ogImageUrl = `${siteUrl}/og-image.jpg`;
 
@@ -69,6 +70,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <Header />
             <main>{children}</main>
             <Footer />
+            <AnalyticsTracker />
             <CookieConsent />
           </CartProvider>
         </ProductsProvider>

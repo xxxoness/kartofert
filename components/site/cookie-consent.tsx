@@ -3,21 +3,21 @@
 import Link from "next/link";
 import Script from "next/script";
 import { useEffect, useState } from "react";
-
-const CONSENT_KEY = "kartofert_cookie_consent";
+import { analyticsConsentKey, notifyAnalyticsConsentChanged } from "@/components/site/analytics-tracker";
 
 export function CookieConsent() {
   const [consent, setConsent] = useState<"accepted" | "declined" | null>(null);
   const metrikaId = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID;
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(CONSENT_KEY);
+    const stored = window.localStorage.getItem(analyticsConsentKey);
     if (stored === "accepted" || stored === "declined") setConsent(stored);
   }, []);
 
   const save = (value: "accepted" | "declined") => {
-    window.localStorage.setItem(CONSENT_KEY, value);
+    window.localStorage.setItem(analyticsConsentKey, value);
     setConsent(value);
+    notifyAnalyticsConsentChanged(value);
   };
 
   return (

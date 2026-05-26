@@ -8,10 +8,13 @@ export async function POST(request: Request) {
       entityType?: string;
       entityId?: string;
       path?: string;
+      productSlug?: string;
+      payload?: unknown;
       metadata?: unknown;
     };
 
-    if (!body.eventName) {
+    const allowedEvents = new Set(["page_view", "product_view", "contact_form_submit", "add_to_cart", "error", "checkout_start"]);
+    if (!body.eventName || !allowedEvents.has(body.eventName)) {
       return NextResponse.json({ ok: false, error: "eventName is required" }, { status: 400 });
     }
 
@@ -20,6 +23,8 @@ export async function POST(request: Request) {
       entityType: body.entityType,
       entityId: body.entityId,
       path: body.path,
+      productSlug: body.productSlug,
+      payload: body.payload,
       metadata: body.metadata
     });
 

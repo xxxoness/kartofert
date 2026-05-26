@@ -15,7 +15,9 @@ export default async function AdminAnalyticsPage() {
             <div className="grid h-14 w-14 place-items-center rounded-[18px] bg-[#eef7e8] text-[#1f7a45]">
               <BarChart3 className="h-7 w-7" />
             </div>
-            <h2 className="mt-4 text-2xl font-black tracking-[-0.04em] text-[#102116]">Данные ещё не собираются</h2>
+            <h2 className="mt-4 text-2xl font-black tracking-[-0.04em] text-[#102116]">
+              {analytics.enabled ? "Внутренняя аналитика" : "Данные ещё не собираются"}
+            </h2>
             <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-[#596553]">{analytics.message}</p>
           </div>
         </div>
@@ -24,7 +26,7 @@ export default async function AdminAnalyticsPage() {
           {analytics.items.map((item) => (
             <div key={item} className="rounded-[16px] border border-[#173c25]/10 bg-[#fffdf8] p-4">
               <p className="font-black text-[#102116]">{item}</p>
-              <p className="mt-1 text-sm font-semibold text-[#596553]">Ожидает подключения</p>
+              <p className="mt-1 text-sm font-semibold text-[#596553]">{analytics.enabled ? "Supabase analytics_events" : "Ожидает подключения"}</p>
             </div>
           ))}
         </div>
