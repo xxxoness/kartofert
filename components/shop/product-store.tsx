@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Product, products as baseProducts } from "@/data/products";
 
 export const productStorageKey = "kartofert-products";
 const productStorageEvent = "kartofert-products-updated";
+
+const ProductsContext = createContext<Product[] | null>(null);
 
 export type ProductOverride = Partial<Product> & { slug: string };
 
@@ -18,8 +20,8 @@ function readOverrides(): ProductOverride[] {
   }
 }
 
-export function mergeProducts(overrides: ProductOverride[]) {
-  return baseProducts.map((product) => {
+export function mergeProducts(overrides: ProductOverride[], sourceProducts: Product[] = baseProducts) {
+  return sourceProducts.map((product) => {
     const override = overrides.find((item) => item.slug === product.slug);
     return override ? ({ ...product, ...override, slug: product.slug } as Product) : product;
   });
@@ -55,7 +57,13 @@ export function saveProductOverride(product: Product) {
   window.dispatchEvent(new Event(productStorageEvent));
 }
 
+export function ProductsProvider({ children, initialProducts }: { children: React.ReactNode; initialProducts: Product[] }) {
+  return <ProductsContext.Provider value={initialProducts}>{children}</ProductsContext.Provider>;
+}
+
 export function useProductsStore() {
+  const contextProducts = useContext(ProductsContext);
+  const sourceProducts = contextProducts?.length ? contextProducts : baseProducts;
   const [overrides, setOverrides] = useState<ProductOverride[]>([]);
 
   useEffect(() => {
@@ -69,7 +77,7 @@ export function useProductsStore() {
     };
   }, []);
 
-  const products = useMemo(() => mergeProducts(overrides), [overrides]);
+  const products = useMemo(() => mergeProducts(overrides, sourceProducts), [overrides, sourceProducts]);
 
   return {
     products,

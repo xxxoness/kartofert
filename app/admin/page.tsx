@@ -5,7 +5,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 
 export default async function AdminPage() {
   const admin = await requireAdmin();
-  const stats = getAdminStats();
+  const stats = await getAdminStats();
 
   return (
     <AdminLayout active="dashboard" title="Панель управления" description="Ключевые разделы сайта и состояние данных." adminEmail={admin.email}>

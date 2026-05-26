@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import type React from "react";
 import { Fragment, useEffect, useMemo, useState } from "react";
@@ -22,15 +22,15 @@ import {
   X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { addLead } from "@/components/shop/leads-store";
+import { addLead, type LeadSource } from "@/components/shop/leads-store";
 import { useCart } from "@/components/shop/cart-provider";
 import { products as catalogProducts } from "@/data/products";
 import { ProductPageData, ProductPageImage, relatedArticleCards, relatedProductCards } from "@/data/product-pages";
 
-type NormUnit = "кг/га" | "г/м²" | "кг/сотка";
+type NormUnit = ProductPageData["calculatorDefaults"]["normUnit"];
 
 const disclaimer =
-  "Расчёт ориентировочный. Для точной схемы учитывайте анализ почвы, сорт картофеля, площадь и технологию внесения.";
+  "Р Р°СЃС‡С‘С‚ РѕСЂРёРµРЅС‚РёСЂРѕРІРѕС‡РЅС‹Р№. Р”Р»СЏ С‚РѕС‡РЅРѕР№ СЃС…РµРјС‹ СѓС‡РёС‚С‹РІР°Р№С‚Рµ Р°РЅР°Р»РёР· РїРѕС‡РІС‹, СЃРѕСЂС‚ РєР°СЂС‚РѕС„РµР»СЏ, РїР»РѕС‰Р°РґСЊ Рё С‚РµС…РЅРѕР»РѕРіРёСЋ РІРЅРµСЃРµРЅРёСЏ.";
 
 function formatNumber(value: number, maximumFractionDigits = 1) {
   return value.toLocaleString("ru-RU", { maximumFractionDigits });
@@ -57,9 +57,9 @@ function calculateNeed({
   const areaHa = safeArea / 100;
 
   const needKg =
-    unit === "г/м²"
+    unit === "Рі/РјВІ"
       ? (areaM2 * safeNorm) / 1000
-      : unit === "кг/га"
+      : unit === "РєРі/РіР°"
         ? areaHa * safeNorm
         : safeArea * safeNorm;
 
@@ -100,24 +100,24 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
 
   const saveLead = (comment: string) => {
     addLead({
-      source: "товар",
-      name: "Покупатель",
-      phone: "уточнить",
+      source: "С‚РѕРІР°СЂ" as LeadSource,
+      name: "РџРѕРєСѓРїР°С‚РµР»СЊ",
+      phone: "СѓС‚РѕС‡РЅРёС‚СЊ",
       productName: product.name,
-      amount: `${formatNumber(result.needKg)} кг`,
-      total: `${formatNumber(result.cost, 0)} ₽`,
+      amount: `${formatNumber(result.needKg)} РєРі`,
+      total: `${formatNumber(result.cost, 0)} в‚Ѕ`,
       comment
     });
   };
 
   const sendCalculation = () => {
-    saveLead(`Расчёт со страницы ${product.name}. Площадь: ${formatNumber(areaSotka)} соток, норма: ${formatNumber(norm)} ${unit}.`);
-    setToast("Расчёт отправлен. Мы свяжемся с вами, уточним наличие, цену и доставку.");
+    saveLead(`Р Р°СЃС‡С‘С‚ СЃРѕ СЃС‚СЂР°РЅРёС†С‹ ${product.name}. РџР»РѕС‰Р°РґСЊ: ${formatNumber(areaSotka)} СЃРѕС‚РѕРє, РЅРѕСЂРјР°: ${formatNumber(norm)} ${unit}.`);
+    setToast("Р Р°СЃС‡С‘С‚ РѕС‚РїСЂР°РІР»РµРЅ. РњС‹ СЃРІСЏР¶РµРјСЃСЏ СЃ РІР°РјРё, СѓС‚РѕС‡РЅРёРј РЅР°Р»РёС‡РёРµ, С†РµРЅСѓ Рё РґРѕСЃС‚Р°РІРєСѓ.");
   };
 
   const leaveRequest = () => {
-    saveLead(`Заявка со страницы ${product.name}. Пользователь просит связаться и уточнить условия.`);
-    setToast("Заявка отправлена. Мы свяжемся с вами для уточнения цены и доставки.");
+    saveLead(`Р—Р°СЏРІРєР° СЃРѕ СЃС‚СЂР°РЅРёС†С‹ ${product.name}. РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РїСЂРѕСЃРёС‚ СЃРІСЏР·Р°С‚СЊСЃСЏ Рё СѓС‚РѕС‡РЅРёС‚СЊ СѓСЃР»РѕРІРёСЏ.`);
+    setToast("Р—Р°СЏРІРєР° РѕС‚РїСЂР°РІР»РµРЅР°. РњС‹ СЃРІСЏР¶РµРјСЃСЏ СЃ РІР°РјРё РґР»СЏ СѓС‚РѕС‡РЅРµРЅРёСЏ С†РµРЅС‹ Рё РґРѕСЃС‚Р°РІРєРё.");
     window.setTimeout(() => document.getElementById("order-request")?.scrollIntoView({ behavior: "smooth", block: "center" }), 120);
   };
 
@@ -151,14 +151,14 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
         : [...current, details];
       window.localStorage.setItem(key, JSON.stringify(next));
     } catch {
-      // Корзина в интерфейсе всё равно обновится через основной cart context.
+      // РљРѕСЂР·РёРЅР° РІ РёРЅС‚РµСЂС„РµР№СЃРµ РІСЃС‘ СЂР°РІРЅРѕ РѕР±РЅРѕРІРёС‚СЃСЏ С‡РµСЂРµР· РѕСЃРЅРѕРІРЅРѕР№ cart context.
     }
   };
 
   const addBagsToCart = (quantity: number, mode: "direct" | "calculated") => {
     const safeQuantity = Math.max(1, quantity);
     if (!cartProduct) {
-      setToast("Не удалось добавить товар в корзину. Попробуйте обновить страницу.");
+      setToast("РќРµ СѓРґР°Р»РѕСЃСЊ РґРѕР±Р°РІРёС‚СЊ С‚РѕРІР°СЂ РІ РєРѕСЂР·РёРЅСѓ. РџРѕРїСЂРѕР±СѓР№С‚Рµ РѕР±РЅРѕРІРёС‚СЊ СЃС‚СЂР°РЅРёС†Сѓ.");
       return;
     }
 
@@ -171,8 +171,8 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
     saveCartDetails(safeQuantity);
     setToast(
       mode === "calculated"
-        ? `Расчёт добавлен в корзину: ${product.name} — ${safeQuantity} меш.`
-        : `Товар добавлен в корзину: ${product.name} — ${safeQuantity} меш.`
+        ? `Р Р°СЃС‡С‘С‚ РґРѕР±Р°РІР»РµРЅ РІ РєРѕСЂР·РёРЅСѓ: ${product.name} вЂ” ${safeQuantity} РјРµС€.`
+        : `РўРѕРІР°СЂ РґРѕР±Р°РІР»РµРЅ РІ РєРѕСЂР·РёРЅСѓ: ${product.name} вЂ” ${safeQuantity} РјРµС€.`
     );
   };
 
@@ -196,7 +196,7 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
 
           <div className="mt-2.5 rounded-[14px] border border-[#173c25]/10 bg-[#fffdf8] px-3 py-2 shadow-[0_10px_22px_rgba(45,35,17,.035)]">
             <p className="text-[13px] font-bold leading-5 text-[#334236]">
-              <span className="mr-2 font-black uppercase tracking-[0.1em] text-[#8d650f]">Коротко:</span>
+              <span className="mr-2 font-black uppercase tracking-[0.1em] text-[#8d650f]">РљРѕСЂРѕС‚РєРѕ:</span>
               {product.quickSummary}
             </p>
           </div>
@@ -225,11 +225,11 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
 
           <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
             <Button onClick={leaveRequest} className="h-12 rounded-[12px] bg-[#063b23] px-6 text-white shadow-none hover:bg-[#0d5a36]">
-              Оставить заявку
+              РћСЃС‚Р°РІРёС‚СЊ Р·Р°СЏРІРєСѓ
               <ArrowRight className="h-5 w-5" />
             </Button>
             <Button asChild variant="outline" className="h-12 rounded-[12px] border-[#f5b400] bg-white px-6 text-[#8c5b00] hover:bg-[#fff4cf]">
-              <Link href="/calculator">Рассчитать количество</Link>
+              <Link href="/calculator">Р Р°СЃСЃС‡РёС‚Р°С‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ</Link>
             </Button>
           </div>
         </div>
@@ -243,7 +243,7 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
                 activeOrderTab === "bags" ? "bg-[#063b23] text-white shadow-[0_8px_20px_rgba(6,59,35,.18)]" : "text-[#4f5d52] hover:bg-white"
               }`}
             >
-              Купить мешками
+              РљСѓРїРёС‚СЊ РјРµС€РєР°РјРё
             </button>
             <button
               type="button"
@@ -252,53 +252,53 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
                 activeOrderTab === "area" ? "bg-[#063b23] text-white shadow-[0_8px_20px_rgba(6,59,35,.18)]" : "text-[#4f5d52] hover:bg-white"
               }`}
             >
-              Рассчитать по площади
+              Р Р°СЃСЃС‡РёС‚Р°С‚СЊ РїРѕ РїР»РѕС‰Р°РґРё
             </button>
           </div>
 
           {activeOrderTab === "bags" ? (
             <div className="mt-3 grid gap-3">
               <div>
-                <h2 className="text-xl font-black tracking-[-0.045em] text-[#102116]">Купить мешками</h2>
-                <p className="mt-1 text-sm font-semibold leading-5 text-[#647060]">Выберите количество мешков без расчёта по площади.</p>
+                <h2 className="text-xl font-black tracking-[-0.045em] text-[#102116]">РљСѓРїРёС‚СЊ РјРµС€РєР°РјРё</h2>
+                <p className="mt-1 text-sm font-semibold leading-5 text-[#647060]">Р’С‹Р±РµСЂРёС‚Рµ РєРѕР»РёС‡РµСЃС‚РІРѕ РјРµС€РєРѕРІ Р±РµР· СЂР°СЃС‡С‘С‚Р° РїРѕ РїР»РѕС‰Р°РґРё.</p>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="rounded-[14px] border border-[#173c25]/10 bg-[#fffdf8] p-3">
-                  <p className="text-xs font-bold text-[#647060]">Цена за мешок</p>
-                  <p className="mt-1 text-2xl font-black tracking-[-0.05em] text-[#102116]">{product.price} ₽</p>
+                  <p className="text-xs font-bold text-[#647060]">Р¦РµРЅР° Р·Р° РјРµС€РѕРє</p>
+                  <p className="mt-1 text-2xl font-black tracking-[-0.05em] text-[#102116]">{product.price} в‚Ѕ</p>
                 </div>
                 <div className="rounded-[14px] border border-[#173c25]/10 bg-[#fffdf8] p-3">
-                  <p className="text-xs font-bold text-[#647060]">Фасовка</p>
-                  <p className="mt-1 text-2xl font-black tracking-[-0.05em] text-[#102116]">{product.packageWeight} кг</p>
+                  <p className="text-xs font-bold text-[#647060]">Р¤Р°СЃРѕРІРєР°</p>
+                  <p className="mt-1 text-2xl font-black tracking-[-0.05em] text-[#102116]">{product.packageWeight} РєРі</p>
                 </div>
               </div>
 
               <div className="rounded-[16px] border border-[#173c25]/10 bg-white p-3">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="font-black text-[#102116]">Количество мешков</p>
+                  <p className="font-black text-[#102116]">РљРѕР»РёС‡РµСЃС‚РІРѕ РјРµС€РєРѕРІ</p>
                   <div className="flex items-center rounded-full border border-[#d7d0bf] bg-[#fbf8f1] p-1">
-                    <button type="button" onClick={() => setBagQuantity((value) => Math.max(1, value - 1))} className="grid h-9 w-9 place-items-center rounded-full hover:bg-white" aria-label="Уменьшить количество">
+                    <button type="button" onClick={() => setBagQuantity((value) => Math.max(1, value - 1))} className="grid h-9 w-9 place-items-center rounded-full hover:bg-white" aria-label="РЈРјРµРЅСЊС€РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ">
                       <Minus className="h-4 w-4" />
                     </button>
                     <span className="w-10 text-center font-black">{bagQuantity}</span>
-                    <button type="button" onClick={() => setBagQuantity((value) => value + 1)} className="grid h-9 w-9 place-items-center rounded-full hover:bg-white" aria-label="Увеличить количество">
+                    <button type="button" onClick={() => setBagQuantity((value) => value + 1)} className="grid h-9 w-9 place-items-center rounded-full hover:bg-white" aria-label="РЈРІРµР»РёС‡РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ">
                       <Plus className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
                 <div className="mt-3 grid grid-cols-3 gap-2">
-                  <Metric label="Количество" value={`${bagQuantity} меш.`} />
-                  <Metric label="Вес" value={`${bagQuantity * product.packageWeight} кг`} />
-                  <Metric label="Итого" value={`${bagQuantity * product.price} ₽`} />
+                  <Metric label="РљРѕР»РёС‡РµСЃС‚РІРѕ" value={`${bagQuantity} РјРµС€.`} />
+                  <Metric label="Р’РµСЃ" value={`${bagQuantity * product.packageWeight} РєРі`} />
+                  <Metric label="РС‚РѕРіРѕ" value={`${bagQuantity * product.price} в‚Ѕ`} />
                 </div>
               </div>
 
               <Button onClick={() => addBagsToCart(bagQuantity, "direct")} className="h-11 rounded-[12px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]">
-                Добавить в корзину
+                Р”РѕР±Р°РІРёС‚СЊ РІ РєРѕСЂР·РёРЅСѓ
               </Button>
               <button onClick={leaveRequest} className="rounded-[12px] border border-[#173c25]/10 bg-white px-4 py-2.5 text-sm font-black text-[#063b23] transition hover:border-[#f5b400]/70 hover:bg-[#fff8df]">
-                Оставить заявку
+                РћСЃС‚Р°РІРёС‚СЊ Р·Р°СЏРІРєСѓ
               </button>
             </div>
           ) : (
@@ -308,51 +308,51 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
                   <Calculator className="h-4 w-4" />
                 </span>
                 <div>
-                  <h2 className="text-xl font-black tracking-[-0.045em] text-[#102116]">Быстрый расчёт</h2>
-                  <p className="text-xs font-bold text-[#647060]">Для участков и хозяйств</p>
+                  <h2 className="text-xl font-black tracking-[-0.045em] text-[#102116]">Р‘С‹СЃС‚СЂС‹Р№ СЂР°СЃС‡С‘С‚</h2>
+                  <p className="text-xs font-bold text-[#647060]">Р”Р»СЏ СѓС‡Р°СЃС‚РєРѕРІ Рё С…РѕР·СЏР№СЃС‚РІ</p>
                 </div>
               </div>
-              <CalcField label="Норма внесения">
+              <CalcField label="РќРѕСЂРјР° РІРЅРµСЃРµРЅРёСЏ">
                 <div className="grid grid-cols-[1fr_112px] overflow-hidden rounded-[12px] border border-[#173c25]/10 bg-white">
                   <input value={norm} onChange={(event) => setNorm(Number(event.target.value))} type="number" min={0} className="h-10 px-3 font-black text-[#102116] outline-none" />
                   <select value={unit} onChange={(event) => setUnit(event.target.value as NormUnit)} className="border-l border-[#173c25]/10 bg-[#fffdf8] px-2 text-sm font-black text-[#102116] outline-none">
-                    <option value="кг/га">кг/га</option>
-                    <option value="г/м²">г/м²</option>
-                    <option value="кг/сотка">кг/сотка</option>
+                    <option value="РєРі/РіР°">РєРі/РіР°</option>
+                    <option value="Рі/РјВІ">Рі/РјВІ</option>
+                    <option value="РєРі/СЃРѕС‚РєР°">РєРі/СЃРѕС‚РєР°</option>
                   </select>
                 </div>
-                <p className="mt-1.5 text-xs font-bold leading-5 text-[#7b8477]">Базовая норма KartoFert: 60–90 г/м².</p>
+                <p className="mt-1.5 text-xs font-bold leading-5 text-[#7b8477]">Р‘Р°Р·РѕРІР°СЏ РЅРѕСЂРјР° KartoFert: 60вЂ“90 Рі/РјВІ.</p>
               </CalcField>
 
               <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-1">
-                <CalcField label="Вес мешка">
-                  <InputWithSuffix value={bagWeight} onChange={setBagWeight} suffix="кг" />
+                <CalcField label="Р’РµСЃ РјРµС€РєР°">
+                  <InputWithSuffix value={bagWeight} onChange={setBagWeight} suffix="РєРі" />
                 </CalcField>
-                <CalcField label="Площадь участка">
-                  <InputWithSuffix value={areaSotka} onChange={setAreaSotka} suffix="соток" step={0.1} />
+                <CalcField label="РџР»РѕС‰Р°РґСЊ СѓС‡Р°СЃС‚РєР°">
+                  <InputWithSuffix value={areaSotka} onChange={setAreaSotka} suffix="СЃРѕС‚РѕРє" step={0.1} />
                 </CalcField>
-                <CalcField label="Цена за мешок">
-                  <InputWithSuffix value={price} onChange={setPrice} suffix="₽" />
+                <CalcField label="Р¦РµРЅР° Р·Р° РјРµС€РѕРє">
+                  <InputWithSuffix value={price} onChange={setPrice} suffix="в‚Ѕ" />
                 </CalcField>
               </div>
 
               <div className="rounded-[16px] border border-[#173c25]/10 bg-[#f4f8ef] p-2.5">
-                <p className="text-sm font-black text-[#063b23]">Результат расчёта</p>
+                <p className="text-sm font-black text-[#063b23]">Р РµР·СѓР»СЊС‚Р°С‚ СЂР°СЃС‡С‘С‚Р°</p>
                 <div className="mt-2 grid grid-cols-2 gap-2">
-                  <Metric label="Нужно, кг" value={`${formatNumber(result.needKg)} кг`} />
-                  <Metric label="Мешков" value={`${result.bags} шт.`} />
+                  <Metric label="РќСѓР¶РЅРѕ, РєРі" value={`${formatNumber(result.needKg)} РєРі`} />
+                  <Metric label="РњРµС€РєРѕРІ" value={`${result.bags} С€С‚.`} />
                 </div>
                 <div className="mt-2 rounded-[12px] bg-white p-2.5">
-                  <p className="text-xs font-bold text-[#647060]">Итого</p>
-                  <p className="text-3xl font-black tracking-[-0.05em] text-[#063b23]">{formatNumber(result.cost, 0)} ₽</p>
+                  <p className="text-xs font-bold text-[#647060]">РС‚РѕРіРѕ</p>
+                  <p className="text-3xl font-black tracking-[-0.05em] text-[#063b23]">{formatNumber(result.cost, 0)} в‚Ѕ</p>
                 </div>
               </div>
 
               <Button onClick={() => addBagsToCart(result.bags, "calculated")} className="h-11 rounded-[12px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]">
-                Добавить расчёт в корзину
+                Р”РѕР±Р°РІРёС‚СЊ СЂР°СЃС‡С‘С‚ РІ РєРѕСЂР·РёРЅСѓ
               </Button>
               <button onClick={sendCalculation} className="rounded-[12px] border border-[#173c25]/10 bg-white px-4 py-2.5 text-sm font-black text-[#063b23] transition hover:border-[#f5b400]/70 hover:bg-[#fff8df]">
-                Отправить расчёт
+                РћС‚РїСЂР°РІРёС‚СЊ СЂР°СЃС‡С‘С‚
               </button>
               <WarningNote text={disclaimer} compact />
             </div>
@@ -372,8 +372,8 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
 
 function Breadcrumbs({ product }: { product: ProductPageData }) {
   const items = [
-    { label: "Главная", href: "/" },
-    { label: "Каталог", href: "/products" },
+    { label: "Р“Р»Р°РІРЅР°СЏ", href: "/" },
+    { label: "РљР°С‚Р°Р»РѕРі", href: "/products" },
     { label: product.category, href: "/products" },
     { label: product.name }
   ];
@@ -405,10 +405,10 @@ function Toast({ message, onClose }: { message: string | null; onClose: () => vo
           <Info className="h-5 w-5" />
         </span>
         <div>
-          <p className="font-black text-[#102116]">Готово</p>
+          <p className="font-black text-[#102116]">Р“РѕС‚РѕРІРѕ</p>
           <p className="mt-1 text-sm font-semibold leading-5 text-[#536052]">{message}</p>
         </div>
-        <button type="button" onClick={onClose} className="ml-auto grid h-7 w-7 shrink-0 place-items-center rounded-full text-[#6a7469] hover:bg-[#f4efe5]" aria-label="Закрыть уведомление">
+        <button type="button" onClick={onClose} className="ml-auto grid h-7 w-7 shrink-0 place-items-center rounded-full text-[#6a7469] hover:bg-[#f4efe5]" aria-label="Р—Р°РєСЂС‹С‚СЊ СѓРІРµРґРѕРјР»РµРЅРёРµ">
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -481,7 +481,7 @@ function ProductGallery({
         type="button"
         onClick={() => setLightboxOpen(true)}
         className="relative order-1 min-h-[285px] overflow-hidden rounded-[22px] border border-[#173c25]/10 bg-[radial-gradient(circle_at_50%_18%,#ffffff_0%,#fffaf0_39%,#efe5d0_100%)] shadow-[0_18px_42px_rgba(45,35,17,.09)] transition hover:border-[#f5b400]/60 sm:order-2 xl:min-h-[350px]"
-        aria-label="Открыть фото товара"
+        aria-label="РћС‚РєСЂС‹С‚СЊ С„РѕС‚Рѕ С‚РѕРІР°СЂР°"
       >
         <div className="absolute inset-x-6 bottom-5 h-16 rounded-[50%] bg-[#4c301c]/10 blur-xl" />
         <Image
@@ -509,18 +509,18 @@ function ProductGallery({
               type="button"
               onClick={() => setLightboxOpen(false)}
               className="absolute right-3 top-3 z-10 grid h-10 w-10 place-items-center rounded-full bg-white text-[#102116] shadow-[0_10px_24px_rgba(45,35,17,.18)]"
-              aria-label="Закрыть фото"
+              aria-label="Р—Р°РєСЂС‹С‚СЊ С„РѕС‚Рѕ"
             >
               <X className="h-5 w-5" />
             </button>
             <div className="absolute left-4 top-4 z-10 flex gap-2">
-              <button type="button" onClick={() => setZoom((value) => Math.min(2.2, Number((value + 0.2).toFixed(1))))} className="grid h-9 w-9 place-items-center rounded-full bg-white text-[#102116] shadow-[0_10px_24px_rgba(45,35,17,.18)]" aria-label="Увеличить фото">
+              <button type="button" onClick={() => setZoom((value) => Math.min(2.2, Number((value + 0.2).toFixed(1))))} className="grid h-9 w-9 place-items-center rounded-full bg-white text-[#102116] shadow-[0_10px_24px_rgba(45,35,17,.18)]" aria-label="РЈРІРµР»РёС‡РёС‚СЊ С„РѕС‚Рѕ">
                 <Plus className="h-4 w-4" />
               </button>
-              <button type="button" onClick={() => setZoom((value) => Math.max(1, Number((value - 0.2).toFixed(1))))} className="grid h-9 w-9 place-items-center rounded-full bg-white text-[#102116] shadow-[0_10px_24px_rgba(45,35,17,.18)]" aria-label="Уменьшить фото">
+              <button type="button" onClick={() => setZoom((value) => Math.max(1, Number((value - 0.2).toFixed(1))))} className="grid h-9 w-9 place-items-center rounded-full bg-white text-[#102116] shadow-[0_10px_24px_rgba(45,35,17,.18)]" aria-label="РЈРјРµРЅСЊС€РёС‚СЊ С„РѕС‚Рѕ">
                 <Minus className="h-4 w-4" />
               </button>
-              <button type="button" onClick={() => setZoom(1)} className="inline-flex h-9 items-center gap-1 rounded-full bg-white px-3 text-xs font-black text-[#102116] shadow-[0_10px_24px_rgba(45,35,17,.18)]" aria-label="Сбросить масштаб">
+              <button type="button" onClick={() => setZoom(1)} className="inline-flex h-9 items-center gap-1 rounded-full bg-white px-3 text-xs font-black text-[#102116] shadow-[0_10px_24px_rgba(45,35,17,.18)]" aria-label="РЎР±СЂРѕСЃРёС‚СЊ РјР°СЃС€С‚Р°Р±">
                 <RotateCcw className="h-4 w-4" />
                 1:1
               </button>
@@ -529,7 +529,7 @@ function ProductGallery({
               type="button"
               onClick={() => setZoom((value) => (value === 1 ? 1.8 : 1))}
               className="relative h-[min(76vh,700px)] w-full overflow-hidden rounded-[18px] bg-[radial-gradient(circle_at_50%_20%,#ffffff_0%,#fff5df_48%,#ead8b8_100%)]"
-              aria-label="Переключить масштаб фото"
+              aria-label="РџРµСЂРµРєР»СЋС‡РёС‚СЊ РјР°СЃС€С‚Р°Р± С„РѕС‚Рѕ"
             >
               <Image
                 src={activeImage.src}
@@ -540,12 +540,12 @@ function ProductGallery({
                 style={{ transform: `scale(${zoom})` }}
               />
             </button>
-            <p className="mt-2 text-center text-xs font-bold text-[#6a7469]">Клик по изображению переключает масштаб 1x / 1.8x</p>
+            <p className="mt-2 text-center text-xs font-bold text-[#6a7469]">РљР»РёРє РїРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЋ РїРµСЂРµРєР»СЋС‡Р°РµС‚ РјР°СЃС€С‚Р°Р± 1x / 1.8x</p>
             <button
               type="button"
               onClick={() => showImage(-1)}
               className="absolute left-6 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white text-[#102116] shadow-[0_10px_24px_rgba(45,35,17,.18)]"
-              aria-label="Предыдущее фото"
+              aria-label="РџСЂРµРґС‹РґСѓС‰РµРµ С„РѕС‚Рѕ"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -553,7 +553,7 @@ function ProductGallery({
               type="button"
               onClick={() => showImage(1)}
               className="absolute right-6 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white text-[#102116] shadow-[0_10px_24px_rgba(45,35,17,.18)]"
-              aria-label="Следующее фото"
+              aria-label="РЎР»РµРґСѓСЋС‰РµРµ С„РѕС‚Рѕ"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -676,12 +676,12 @@ function Characteristics({ product }: { product: ProductPageData }) {
     <section className="mt-6 rounded-[24px] border border-[#173c25]/10 bg-[#fffdf8] p-3.5 shadow-[0_14px_34px_rgba(45,35,17,.05)]">
       <div className="mb-3 flex flex-col gap-2 rounded-[18px] bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-[24px] font-black tracking-[-0.05em] text-[#102116]">Характеристики и состав</h2>
+          <h2 className="text-[24px] font-black tracking-[-0.05em] text-[#102116]">РҐР°СЂР°РєС‚РµСЂРёСЃС‚РёРєРё Рё СЃРѕСЃС‚Р°РІ</h2>
         </div>
         <div className="flex flex-wrap gap-2">
           <span className="rounded-full bg-[#edf4e8] px-3 py-1 text-xs font-black text-[#315b39]">NPK</span>
-          <span className="rounded-full bg-[#fff1be] px-3 py-1 text-xs font-black text-[#8c5b00]">25 кг</span>
-          <span className="rounded-full bg-[#f3efe5] px-3 py-1 text-xs font-black text-[#596553]">гранулы</span>
+          <span className="rounded-full bg-[#fff1be] px-3 py-1 text-xs font-black text-[#8c5b00]">25 РєРі</span>
+          <span className="rounded-full bg-[#f3efe5] px-3 py-1 text-xs font-black text-[#596553]">РіСЂР°РЅСѓР»С‹</span>
         </div>
       </div>
 
@@ -689,12 +689,12 @@ function Characteristics({ product }: { product: ProductPageData }) {
         <div className="rounded-[18px] border border-[#173c25]/10 bg-white p-3.5">
           <div className="mb-2.5 flex items-end justify-between gap-3">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.12em] text-[#8d650f]">Параметры</p>
-              <h3 className="text-xl font-black tracking-[-0.04em] text-[#102116]">Таблица характеристик</h3>
-              <p className="mt-0.5 text-xs font-semibold text-[#6a7469]">Основные параметры товара для сравнения и расчёта.</p>
+              <p className="text-xs font-black uppercase tracking-[0.12em] text-[#8d650f]">РџР°СЂР°РјРµС‚СЂС‹</p>
+              <h3 className="text-xl font-black tracking-[-0.04em] text-[#102116]">РўР°Р±Р»РёС†Р° С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРє</h3>
+              <p className="mt-0.5 text-xs font-semibold text-[#6a7469]">РћСЃРЅРѕРІРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ С‚РѕРІР°СЂР° РґР»СЏ СЃСЂР°РІРЅРµРЅРёСЏ Рё СЂР°СЃС‡С‘С‚Р°.</p>
             </div>
             <span className="hidden rounded-full border border-[#173c25]/10 px-3 py-1 text-xs font-black text-[#425045] sm:inline-flex">
-              10 ₽ / мешок
+              10 в‚Ѕ / РјРµС€РѕРє
             </span>
           </div>
           <div className="overflow-hidden rounded-[14px] border border-[#173c25]/10 bg-[#fffdf8]">
@@ -710,8 +710,8 @@ function Characteristics({ product }: { product: ProductPageData }) {
         <aside className="flex h-full flex-col rounded-[18px] border border-[#173c25]/10 bg-white p-3.5">
           <div className="mb-2.5 flex items-end justify-between gap-3">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.12em] text-[#8d650f]">Состав</p>
-              <h3 className="text-xl font-black tracking-[-0.04em] text-[#102116]">Элементы питания</h3>
+              <p className="text-xs font-black uppercase tracking-[0.12em] text-[#8d650f]">РЎРѕСЃС‚Р°РІ</p>
+              <h3 className="text-xl font-black tracking-[-0.04em] text-[#102116]">Р­Р»РµРјРµРЅС‚С‹ РїРёС‚Р°РЅРёСЏ</h3>
             </div>
             <span className="rounded-full bg-[#fff1be] px-3 py-1 text-xs font-black text-[#8c5b00]">NPK</span>
           </div>
@@ -735,7 +735,7 @@ function Characteristics({ product }: { product: ProductPageData }) {
               <div key={nutrient.symbol} className="rounded-[14px] border border-[#173c25]/10 bg-white px-3 py-2.5">
                 <div className="flex items-center justify-between gap-3">
                   <p className="font-black text-[#102116]">
-                    {nutrient.symbol} — {nutrient.label.toLowerCase()}
+                    {nutrient.symbol} вЂ” {nutrient.label.toLowerCase()}
                   </p>
                   {nutrient.value ? <span className="rounded-full bg-[#fff1be] px-2.5 py-1 text-xs font-black text-[#8c5b00]">{nutrient.value}</span> : null}
                 </div>
@@ -745,7 +745,7 @@ function Characteristics({ product }: { product: ProductPageData }) {
           </div>
 
           <div className="mt-2.5 rounded-[14px] border border-[#f5b400]/30 bg-[#fff8df] p-3 text-xs font-bold leading-5 text-[#5d4611]">
-            Норма подбирается по площади, анализу почвы и технологии выращивания.
+            РќРѕСЂРјР° РїРѕРґР±РёСЂР°РµС‚СЃСЏ РїРѕ РїР»РѕС‰Р°РґРё, Р°РЅР°Р»РёР·Сѓ РїРѕС‡РІС‹ Рё С‚РµС…РЅРѕР»РѕРіРёРё РІС‹СЂР°С‰РёРІР°РЅРёСЏ.
           </div>
         </aside>
       </div>
@@ -770,7 +770,7 @@ function Instruction({ product }: { product: ProductPageData }) {
           <WarningNote text={product.instruction.important} />
         </div>
         <div className="rounded-[17px] border border-[#173c25]/10 bg-[#fffdf8] p-4">
-          <h3 className="font-black text-[#102116]">Базовая схема</h3>
+          <h3 className="font-black text-[#102116]">Р‘Р°Р·РѕРІР°СЏ СЃС…РµРјР°</h3>
           <ol className="mt-3 space-y-2.5">
             {product.instruction.steps.map((step, index) => (
               <li key={step} className="flex gap-2.5 text-[13px] font-bold leading-5 text-[#354337]">
@@ -790,12 +790,12 @@ function OrderSteps({ product, onSend }: { product: ProductPageData; onSend: () 
     <section id="order-request" className="mt-6 rounded-[20px] border border-[#173c25]/10 bg-[#102116] p-4 text-white shadow-[0_16px_38px_rgba(45,35,17,.1)]">
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-black uppercase tracking-[0.12em] text-[#f5b400]">Заявка</p>
-          <h2 className="mt-1 text-[24px] font-black tracking-[-0.05em]">Как оформить заявку</h2>
+          <p className="text-sm font-black uppercase tracking-[0.12em] text-[#f5b400]">Р—Р°СЏРІРєР°</p>
+          <h2 className="mt-1 text-[24px] font-black tracking-[-0.05em]">РљР°Рє РѕС„РѕСЂРјРёС‚СЊ Р·Р°СЏРІРєСѓ</h2>
         </div>
         <Button onClick={onSend} className="h-11 rounded-[12px] bg-[#f5b400] px-5 text-[#1b1500] shadow-none hover:bg-[#e8a900]">
           <Send className="h-5 w-5" />
-          Отправить расчёт
+          РћС‚РїСЂР°РІРёС‚СЊ СЂР°СЃС‡С‘С‚
         </Button>
       </div>
       <div className="mt-4 grid gap-2.5 md:grid-cols-5">
@@ -815,8 +815,8 @@ function RelatedProducts({ product }: { product: ProductPageData }) {
   return (
     <section className="mt-7">
       <div className="mb-4 flex items-center justify-between gap-4">
-        <h2 className="text-2xl font-black tracking-[-0.05em] text-[#102116]">Похожие товары</h2>
-        <Link href="/products" className="text-sm font-black text-[#063b23] hover:text-[#0d5a36]">Все товары</Link>
+        <h2 className="text-2xl font-black tracking-[-0.05em] text-[#102116]">РџРѕС…РѕР¶РёРµ С‚РѕРІР°СЂС‹</h2>
+        <Link href="/products" className="text-sm font-black text-[#063b23] hover:text-[#0d5a36]">Р’СЃРµ С‚РѕРІР°СЂС‹</Link>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {related.map((item) => (
@@ -826,9 +826,9 @@ function RelatedProducts({ product }: { product: ProductPageData }) {
             </div>
             <span className="mt-2 w-fit rounded-full bg-[#edf4e8] px-2.5 py-0.5 text-[11px] font-black text-[#315b39]">{item.category}</span>
             <h3 className="mt-1.5 line-clamp-2 text-[15px] font-black leading-tight text-[#102116]">{item.name}</h3>
-            <p className="mt-1 text-xs font-bold text-[#657064]">{item.elements.map((element) => element.symbol).join(", ")} · {item.packageSize}</p>
+            <p className="mt-1 text-xs font-bold text-[#657064]">{item.elements.map((element) => element.symbol).join(", ")} В· {item.packageSize}</p>
             <div className="mt-auto flex items-center justify-between pt-2">
-              <p className="text-xl font-black tracking-[-0.05em] text-[#102116]">{item.price ?? 10} ₽</p>
+              <p className="text-xl font-black tracking-[-0.05em] text-[#102116]">{item.price ?? 10} в‚Ѕ</p>
               <span className="grid h-9 w-9 place-items-center rounded-[11px] bg-[#063b23] text-white">
                 <ArrowRight className="h-5 w-5" />
               </span>
@@ -846,8 +846,8 @@ function RelatedArticles({ product }: { product: ProductPageData }) {
   return (
     <section className="mt-7">
       <div className="mb-4 flex items-center justify-between gap-4">
-        <h2 className="text-2xl font-black tracking-[-0.05em] text-[#102116]">Полезные статьи</h2>
-        <Link href="/knowledge" className="text-sm font-black text-[#063b23] hover:text-[#0d5a36]">Все статьи</Link>
+        <h2 className="text-2xl font-black tracking-[-0.05em] text-[#102116]">РџРѕР»РµР·РЅС‹Рµ СЃС‚Р°С‚СЊРё</h2>
+        <Link href="/knowledge" className="text-sm font-black text-[#063b23] hover:text-[#0d5a36]">Р’СЃРµ СЃС‚Р°С‚СЊРё</Link>
       </div>
       <div className="grid gap-3 lg:grid-cols-3">
         {related.map((article, index) => (
@@ -859,7 +859,7 @@ function RelatedArticles({ product }: { product: ProductPageData }) {
               <p className="text-xs font-bold text-[#7c6423]">{article.date}</p>
               <h3 className="mt-2 min-h-[44px] text-base font-black leading-tight text-[#102116]">{article.title}</h3>
               <span className="mt-3 inline-flex items-center gap-2 text-sm font-black text-[#1b6b40]">
-                Читать статью <ArrowRight className="h-4 w-4" />
+                Р§РёС‚Р°С‚СЊ СЃС‚Р°С‚СЊСЋ <ArrowRight className="h-4 w-4" />
               </span>
             </div>
           </Link>

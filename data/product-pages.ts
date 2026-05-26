@@ -34,7 +34,7 @@ export type ProductPageData = {
   characteristics: { label: string; value: string }[];
   calculatorDefaults: {
     norm: number;
-    normUnit: "кг/га" | "г/м²" | "кг/сотка";
+    normUnit: Product["normUnit"] | "кг/га" | "г/м²" | "кг/сотка";
     bagWeight: number;
     areaSotka: number;
     price: number;

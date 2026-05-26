@@ -5,10 +5,10 @@ import { requireAdmin } from "@/lib/admin-auth";
 
 export default async function AdminLogsPage() {
   const admin = await requireAdmin();
-  const logs = getAdminLogs();
+  const logs = await getAdminLogs();
 
   return (
-    <AdminLayout active="logs" title="Логи действий" description="История входов и изменений появится после подключения серверного журнала." adminEmail={admin.email}>
+    <AdminLayout active="logs" title="Логи действий" description="История изменений товаров, статей, заказов и настроек сайта." adminEmail={admin.email}>
       <section className="rounded-[22px] border border-[#173c25]/10 bg-white p-6 shadow-[0_16px_42px_rgba(45,35,17,.06)]">
         {logs.length === 0 ? (
           <div className="grid min-h-[300px] place-items-center text-center">
@@ -22,7 +22,38 @@ export default async function AdminLogsPage() {
               </p>
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[860px] border-separate border-spacing-y-3 text-left">
+              <thead className="text-xs font-black uppercase tracking-[0.12em] text-[#6e5b22]">
+                <tr>
+                  <th className="px-3 py-2">Дата</th>
+                  <th className="px-3 py-2">Действие</th>
+                  <th className="px-3 py-2">Сущность</th>
+                  <th className="px-3 py-2">Сообщение</th>
+                  <th className="px-3 py-2">Metadata</th>
+                </tr>
+              </thead>
+              <tbody>
+                {logs.map((log) => (
+                  <tr key={log.id} className="rounded-[18px] bg-[#fffdf8] text-sm font-semibold text-[#25372a] shadow-[0_10px_26px_rgba(45,35,17,.04)]">
+                    <td className="rounded-l-[18px] px-3 py-4 text-xs text-[#596553]">{log.createdAt.toLocaleString("ru-RU")}</td>
+                    <td className="px-3 py-4">
+                      <span className="rounded-full border border-[#173c25]/10 bg-white px-3 py-1 text-xs font-black text-[#063b23]">{log.action}</span>
+                    </td>
+                    <td className="px-3 py-4 text-xs text-[#596553]">{log.entityType || "site"} {log.entityId ? `#${log.entityId.slice(0, 6)}` : ""}</td>
+                    <td className="px-3 py-4">{log.message || "Без описания"}</td>
+                    <td className="rounded-r-[18px] px-3 py-4">
+                      <code className="block max-w-[260px] truncate rounded-[10px] bg-white px-3 py-2 text-xs text-[#596553]">
+                        {log.metadata ? JSON.stringify(log.metadata) : "-"}
+                      </code>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </AdminLayout>
   );

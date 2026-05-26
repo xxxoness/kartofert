@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  shortTitle      String?
+  description     String
+  shortDescription String?
+  category        String
+  type            String?
+  stage           String?
+  task            String?
+  nutrients       Json?
+  composition     Json?
+  specs           Json?
+  instructions    Json?
+  image           String?
+  images          Json?
+  packageWeightKg Float    @default(25)
+  price           Decimal?
+  currency        String   @default("BYN")
+  priceMode       String   @default("request")
+  stockStatus     String   @default("in_stock")
+  stockQty        Int?
+  isPublished     Boolean  @default(true)
+  isFeatured      Boolean  @default(false)
+  sortOrder       Int      @default(0)
+  seoTitle        String?
+  seoDescription  String?
+  legacy          Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Article {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  title          String
+  excerpt        String
+  content        String
+  category       String
+  coverImage     String?
+  readTime       String?
+  publishedAt    DateTime?
+  status         String    @default("draft")
+  isFeatured     Boolean   @default(false)
+  seoTitle       String?
+  seoDescription String?
+  legacy         Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  orderNumber     String   @unique
+  customerName    String
+  customerEmail   String?
+  customerPhone   String?
+  customerAddress String?
+  comment         String?
+  items           Json
+  subtotal        Decimal?
+  total           Decimal?
+  currency        String   @default("BYN")
+  status          String   @default("new")
+  paymentStatus   String   @default("pending")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model SiteSettings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdminLog {
+  id         String   @id @default(cuid())
+  action     String
+  entityType String?
+  entityId   String?
+  message    String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+}

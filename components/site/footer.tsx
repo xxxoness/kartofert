@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
 import { navItems, productCategories } from "@/data/categories";
-import { siteConfig } from "@/config/site";
+import { getSiteSettings } from "@/lib/settings";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shop/logo";
 
-export function Footer() {
+export async function Footer() {
+  const settings = await getSiteSettings();
+
   return (
     <footer className="border-t border-[#173c25]/10 bg-[#fbf7ec] py-10 text-[#102116]">
       <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8">
@@ -43,17 +45,17 @@ export function Footer() {
           <div>
             <h3 className="mb-4 text-sm font-black uppercase tracking-[0.12em] text-[#6e5b22]">Контакты</h3>
             <div className="grid gap-3 text-sm font-semibold text-[#4f5e4f]">
-              <a href={`tel:${siteConfig.phone.replaceAll(" ", "")}`} className="flex items-center gap-2 transition hover:text-[#063b23]">
+              <a href={`tel:${settings.phone.replaceAll(" ", "")}`} className="flex items-center gap-2 transition hover:text-[#063b23]">
                 <Phone className="h-4 w-4 text-[#1f7a45]" />
-                {siteConfig.phone}
+                {settings.phone}
               </a>
-              <a href={`mailto:${siteConfig.email}`} className="flex items-center gap-2 transition hover:text-[#063b23]">
+              <a href={`mailto:${settings.email}`} className="flex items-center gap-2 transition hover:text-[#063b23]">
                 <Mail className="h-4 w-4 text-[#1f7a45]" />
-                {siteConfig.email}
+                {settings.email}
               </a>
               <span className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-[#1f7a45]" />
-                {siteConfig.address}
+                {settings.city}
               </span>
             </div>
             <div className="mt-5 rounded-[14px] border border-[#173c25]/10 bg-white p-3">

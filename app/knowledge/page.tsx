@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { KnowledgeBasePage } from "@/components/shop/knowledge-base-page";
+import { getPublishedArticles } from "@/lib/articles";
 
 export const metadata: Metadata = {
   title: "База знаний",
@@ -7,6 +8,7 @@ export const metadata: Metadata = {
     "Практические статьи KartoFert по питанию картофеля, схемам внесения, расчётам, ошибкам и хранению урожая."
 };
 
-export default function KnowledgePage() {
-  return <KnowledgeBasePage />;
+export default async function KnowledgePage() {
+  const articles = await getPublishedArticles();
+  return <KnowledgeBasePage articles={articles} />;
 }

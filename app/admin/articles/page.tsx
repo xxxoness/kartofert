@@ -6,7 +6,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 
 export default async function AdminArticlesPage() {
   const admin = await requireAdmin();
-  const articles = getArticlesForAdmin();
+  const articles = await getArticlesForAdmin();
 
   return (
     <AdminLayout active="articles" title="Статьи" description="Материалы базы знаний и заготовка редактора." adminEmail={admin.email}>
@@ -52,9 +52,9 @@ export default async function AdminArticlesPage() {
                   <td className="px-5 py-4 text-sm font-bold text-[#40513f]">{article.date}</td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-2">
-                      <button className="grid h-10 w-10 place-items-center rounded-[12px] border border-[#173c25]/10 text-[#063b23] transition hover:border-[#f5b400]" title="Редактировать">
+                      <Link href={`/admin/articles/${article.id}/edit`} className="grid h-10 w-10 place-items-center rounded-[12px] border border-[#173c25]/10 text-[#063b23] transition hover:border-[#f5b400]" title="Редактировать">
                         <Pencil className="h-4 w-4" />
-                      </button>
+                      </Link>
                       <Link href={`/knowledge/${article.slug}`} className="grid h-10 w-10 place-items-center rounded-[12px] border border-[#173c25]/10 text-[#063b23] transition hover:border-[#f5b400]" title="Открыть на сайте">
                         <Eye className="h-4 w-4" />
                       </Link>

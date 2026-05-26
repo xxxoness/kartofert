@@ -1,117 +1,73 @@
-import { articles } from "@/data/articles";
-import { products } from "@/data/products";
-import { siteConfig } from "@/config/site";
+import { Prisma } from "@prisma/client";
+import { getAdminArticles } from "@/lib/articles";
+import { getAdminLogs as readAdminLogs } from "@/lib/admin-logs";
+import { getAnalyticsSummary as readAnalyticsSummary } from "@/lib/analytics";
+import { getOrders } from "@/lib/orders";
+import { getAdminProducts } from "@/lib/products";
+import { getSiteSettings as readSiteSettings } from "@/lib/settings";
 
-export type AdminProductRow = {
-  slug: string;
-  name: string;
-  category: string;
-  price: number | null;
-  packageSize: string;
-  availability: string;
-  status: "published" | "hidden";
-  image: string;
-  elements: string;
-};
+function money(value: Prisma.Decimal | number | null | undefined) {
+  if (value == null) return null;
+  return typeof value === "number" ? value : Number(value.toString());
+}
 
-export type AdminArticleRow = {
-  slug: string;
-  title: string;
-  category: string;
-  status: "published" | "draft";
-  date: string;
-  image: string;
-};
+export async function getProductsForAdmin() {
+  const rows = await getAdminProducts();
 
-export type AdminOrderRow = {
-  id: string;
-  customer: string;
-  phone: string;
-  email?: string;
-  total: number;
-  status: string;
-  paymentStatus: string;
-  date: string;
-};
-
-const articleImages = [
-  "/assets/images/knowledge-base/articles/kb-article-potato-growth-stage.png",
-  "/assets/images/knowledge-base/articles/kb-article-potato-leaves-healthy.png",
-  "/assets/images/knowledge-base/articles/kb-article-fertilizer-granules.png",
-  "/assets/images/knowledge-base/articles/kb-article-potato-sprouting-tubers.png",
-  "/assets/images/knowledge-base/articles/kb-article-potato-leaf-deficiency.png",
-  "/assets/images/knowledge-base/tools/kb-tool-fertilizer-calculator.png",
-  "/assets/images/knowledge-base/articles/kb-article-potato-storage-crate.png"
-];
-
-export function getProductsForAdmin(): AdminProductRow[] {
-  return products.map((product) => ({
+  return rows.map((product) => ({
+    id: product.id,
     slug: product.slug,
-    name: product.name,
+    name: product.title,
     category: product.category,
-    price: typeof product.price === "number" ? product.price : null,
-    packageSize: product.packageSize,
-    availability: product.inStock ? "В наличии" : "Уточняется",
-    status: "published",
-    image: `/assets/products/${product.slug}/front.png`,
-    elements: product.elements.map((element) => element.symbol).join(", ")
+    price: money(product.price),
+    currency: product.currency,
+    priceMode: product.priceMode,
+    packageSize: `${product.packageWeightKg} кг`,
+    availability: product.stockStatus,
+    stockQty: product.stockQty,
+    status: product.isPublished ? "published" : "hidden",
+    image: product.image ?? `/assets/products/${product.slug}/front.png`,
+    elements: Array.isArray(product.nutrients)
+      ? product.nutrients
+          .map((element) => (typeof element === "object" && element && "symbol" in element ? String(element.symbol) : ""))
+          .filter(Boolean)
+          .join(", ")
+      : ""
   }));
 }
 
-export function getArticlesForAdmin(): AdminArticleRow[] {
-  return articles.map((article, index) => ({
+export async function getArticlesForAdmin() {
+  const rows = await getAdminArticles();
+
+  return rows.map((article) => ({
+    id: article.id,
     slug: article.slug,
     title: article.title,
     category: article.category,
-    status: "published",
-    date: article.date,
-    image: articleImages[index % articleImages.length]
+    status: article.status,
+    date: article.publishedAt ? article.publishedAt.toLocaleDateString("ru-RU") : "Не опубликована",
+    image: article.coverImage ?? "/assets/images/knowledge-base/articles/kb-article-potato-growth-stage.png"
   }));
 }
 
-export function getOrdersForAdmin(): AdminOrderRow[] {
-  return [];
+export async function getOrdersForAdmin() {
+  return getOrders();
 }
 
 export function getAnalyticsSummary() {
-  return {
-    enabled: false,
-    message: "Аналитика начнёт собираться после подключения tracking endpoint.",
-    items: [
-      "Посетители сегодня",
-      "Активные сейчас",
-      "Просмотры страниц",
-      "Популярные страницы",
-      "Популярные товары",
-      "Добавления в корзину",
-      "Начатые оформления заказа",
-      "Отправленные формы",
-      "Ошибки"
-    ]
-  };
+  return readAnalyticsSummary();
 }
 
-export function getSiteSettings() {
-  return {
-    phone: siteConfig.phone,
-    email: siteConfig.email,
-    city: siteConfig.address,
-    footerText: "Интернет-магазин удобрений для картофеля.",
-    onlinePaymentEnabled: true,
-    pricesEnabled: true,
-    currency: "₽",
-    primaryCta: "Перейти в каталог"
-  };
+export async function getSiteSettings() {
+  return readSiteSettings();
 }
 
-export function getAdminLogs() {
-  return [];
+export async function getAdminLogs() {
+  return readAdminLogs();
 }
 
-export function getAdminStats() {
-  const productRows = getProductsForAdmin();
-  const articleRows = getArticlesForAdmin();
-  const orderRows = getOrdersForAdmin();
+export async function getAdminStats() {
+  const [productRows, articleRows, orderRows] = await Promise.all([getProductsForAdmin(), getArticlesForAdmin(), getOrdersForAdmin()]);
 
   return {
     products: {
@@ -121,8 +77,8 @@ export function getAdminStats() {
     },
     orders: {
       total: orderRows.length,
-      new: orderRows.filter((order) => order.status === "Новый").length,
-      processing: orderRows.filter((order) => order.status === "В обработке").length
+      new: orderRows.filter((order) => order.status === "new").length,
+      processing: orderRows.filter((order) => order.status === "processing").length
     },
     articles: {
       total: articleRows.length,

@@ -9,6 +9,7 @@ import { formatProductPrice } from "@/data/products";
 import { useCart } from "@/components/shop/cart-provider";
 import { Button } from "@/components/ui/button";
 import { CheckoutStepper } from "@/components/shop/checkout-stepper";
+import { createCheckoutOrder } from "@/app/checkout/actions";
 
 export const lastOrderKey = "kartofert-last-order";
 
@@ -89,7 +90,7 @@ export function CheckoutForm() {
     return Object.keys(nextErrors).length === 0;
   }
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     if (!validate(form) || !items.length) return;
@@ -123,6 +124,19 @@ export function CheckoutForm() {
         comment: String(form.get("comment") ?? "")
       }
     };
+
+    await createCheckoutOrder({
+      orderNumber: order.number,
+      customerName: order.customer.name,
+      customerEmail: order.customer.email,
+      customerPhone: order.customer.phone,
+      customerAddress: `${order.customer.city} ${order.customer.address}`.trim(),
+      comment: order.customer.comment,
+      items: order.items,
+      subtotal: order.total,
+      total: order.total,
+      currency: "BYN"
+    });
 
     window.localStorage.setItem(lastOrderKey, JSON.stringify(order));
     window.setTimeout(() => {
