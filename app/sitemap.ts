@@ -1,32 +1,51 @@
 import type { MetadataRoute } from "next";
-import { getPublishedArticles } from "@/lib/articles";
-import { getPublishedProducts } from "@/lib/products";
-import { absoluteUrl } from "@/lib/site-url";
+import { SITE_URL } from "@/lib/site-url";
 
-const staticRoutes = ["/", "/products", "/potato", "/calculator", "/delivery", "/knowledge", "/about", "/contacts", "/cart", "/checkout"];
-
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [products, articles] = await Promise.all([getPublishedProducts(), getPublishedArticles()]);
+export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
   return [
-    ...staticRoutes.map((route) => ({
-      url: absoluteUrl(route),
+    {
+      url: SITE_URL,
       lastModified: now,
-      changeFrequency: route === "/" ? "daily" as const : "weekly" as const,
-      priority: route === "/" ? 1 : 0.7
-    })),
-    ...products.map((product) => ({
-      url: absoluteUrl(`/products/${product.slug}`),
+      changeFrequency: "weekly",
+      priority: 1
+    },
+    {
+      url: `${SITE_URL}/catalog`,
       lastModified: now,
-      changeFrequency: "weekly" as const,
+      changeFrequency: "weekly",
+      priority: 0.9
+    },
+    {
+      url: `${SITE_URL}/potato`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9
+    },
+    {
+      url: `${SITE_URL}/delivery`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7
+    },
+    {
+      url: `${SITE_URL}/knowledge`,
+      lastModified: now,
+      changeFrequency: "weekly",
       priority: 0.8
-    })),
-    ...articles.map((article) => ({
-      url: absoluteUrl(`/knowledge/${article.slug}`),
+    },
+    {
+      url: `${SITE_URL}/about`,
       lastModified: now,
-      changeFrequency: "monthly" as const,
+      changeFrequency: "monthly",
       priority: 0.6
-    }))
+    },
+    {
+      url: `${SITE_URL}/contacts`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7
+    }
   ];
 }
