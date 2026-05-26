@@ -116,7 +116,7 @@ export default function AboutPage() {
           <span className="text-[#102116]">О нас</span>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center">
           <div>
             <span className="inline-flex rounded-[10px] bg-[#fff1be] px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-[#8c5b00]">
               О нас
@@ -128,16 +128,14 @@ export default function AboutPage() {
               KartoFert — специализированный магазин удобрений для картофеля. Мы помогаем фермерам и дачникам получать стабильный и качественный урожай с помощью правильного питания растений.
             </p>
 
-            <div className="mt-6 grid gap-3 rounded-[20px] border border-[#173c25]/10 bg-white/82 p-3 shadow-[0_18px_46px_rgba(45,35,17,.06)] sm:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-6 grid w-full gap-4 rounded-[20px] border border-[#173c25]/10 bg-white/82 p-4 shadow-[0_18px_46px_rgba(45,35,17,.06)] sm:grid-cols-2 xl:grid-cols-4">
               {heroBenefits.map(({ icon: Icon, title, text }) => (
-                <article key={title} className="flex gap-3 rounded-[14px] bg-[#fffdf7] p-3">
-                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#eef7e8] text-[#063b23] shadow-[0_10px_22px_rgba(45,35,17,.05)]">
+                <article key={title} className="min-w-0 rounded-[14px] bg-[#fffdf7] p-4">
+                  <div className="grid h-11 w-11 place-items-center rounded-full bg-[#eef7e8] text-[#063b23] shadow-[0_10px_22px_rgba(45,35,17,.05)]">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <div>
-                    <h2 className="text-sm font-black leading-5 text-[#071a10]">{title}</h2>
-                    <p className="mt-1 text-xs font-semibold leading-5 text-[#5e6858]">{text}</p>
-                  </div>
+                  <h2 className="mt-3 text-[15px] font-black leading-5 text-[#071a10]">{title}</h2>
+                  <p className="mt-1.5 text-xs font-semibold leading-5 text-[#5e6858]">{text}</p>
                 </article>
               ))}
             </div>
@@ -157,7 +155,7 @@ export default function AboutPage() {
       </section>
 
       <section className="container-shell py-3 md:py-4">
-        <div className="grid gap-4 lg:grid-cols-[0.72fr_1.58fr]">
+        <div className="grid gap-4 lg:grid-cols-[minmax(280px,0.85fr)_minmax(0,1.9fr)]">
           <article className="relative overflow-hidden rounded-[22px] border border-[#f5b400]/28 bg-[#fff7dd] p-5 shadow-[0_18px_46px_rgba(45,35,17,.06)] md:p-6">
             <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#f5b400]/18" />
             <span className="relative inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-[#063b23] shadow-[0_10px_24px_rgba(45,35,17,.08)]">
@@ -171,14 +169,14 @@ export default function AboutPage() {
 
           <article className="rounded-[22px] border border-[#173c25]/10 bg-[#fffdf7] p-5 shadow-[0_18px_46px_rgba(45,35,17,.06)] md:p-6">
             <h2 className="text-2xl font-black tracking-[-0.04em] text-[#063b23]">Наши принципы</h2>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-[repeat(4,minmax(160px,1fr))]">
               {principles.map(({ icon: Icon, title, text }) => (
-                <div key={title} className="rounded-[16px] border border-[#173c25]/8 bg-white p-4">
+                <div key={title} className="flex min-h-[150px] min-w-0 flex-col rounded-[16px] border border-[#173c25]/8 bg-white p-4">
                   <div className="flex items-center gap-3">
                     <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#eef7e8] text-[#063b23]">
                       <Icon className="h-5 w-5" />
                     </span>
-                    <h3 className="text-base font-black text-[#071a10]">{title}</h3>
+                    <h3 className="text-[15px] font-black leading-5 text-[#071a10]">{title}</h3>
                   </div>
                   <p className="mt-3 text-sm leading-6 text-[#5e6858]">{text}</p>
                 </div>
