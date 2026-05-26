@@ -118,7 +118,7 @@ export function ProductDetail({
 
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Button onClick={addRequest} className="h-13 rounded-[10px] bg-[#063b23] px-8 text-white hover:bg-[#0d5a36]">
-              Оставить заявку
+              Связаться
               <ArrowRight className="h-5 w-5" />
             </Button>
             <Button asChild variant="outline" className="h-13 rounded-[10px] border-[#f5b400] bg-white px-8 text-[#8c5b00] hover:bg-[#fff4cf]">
@@ -167,10 +167,10 @@ export function ProductDetail({
             </div>
             <Button onClick={addRequest} className="h-12 rounded-[9px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]">
               <ShoppingCart className="h-5 w-5" />
-              Добавить в заявку
+              Связаться
             </Button>
             <button onClick={addRequest} className="text-center text-sm font-black text-[#102116] hover:text-[#063b23]">
-              Купить в один клик
+              Перейти в контакты
             </button>
             <div className="rounded-[12px] border border-[#173c25]/10 bg-[#fffdf7] p-3 text-sm font-semibold leading-6 text-[#596553]">
               Рекомендации по нормам и безопасности уточняются по инструкции производителя и зависят от культуры, почвы и технологии выращивания.

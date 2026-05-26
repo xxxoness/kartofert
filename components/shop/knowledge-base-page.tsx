@@ -139,11 +139,11 @@ const utilityCards = [
     icon: HelpCircle
   },
   {
-    title: "Калькулятор удобрений",
-    text: "Рассчитайте норму внесения удобрений под ваш участок за пару минут.",
+    title: "Помощь с расчётом",
+    text: "Подскажем, как оценить потребность удобрений под ваш участок.",
     image: "/assets/images/knowledge-base/tools/kb-tool-fertilizer-calculator.png",
-    href: "/calculator",
-    cta: "Рассчитать норму",
+    href: "/contacts",
+    cta: "Связаться",
     icon: Calculator
   }
 ];
@@ -278,13 +278,13 @@ export function KnowledgeBasePage({ articles }: { articles?: KnowledgeArticle[] 
                 Не знаете, с чего начать?
               </h2>
               <p className="mt-3 text-base leading-7 text-[#5b6657]">
-                Перейдите в калькулятор, укажите площадь участка и получите понятную схему питания картофеля.
+                Напишите нам, укажите площадь участка и получите понятную консультацию по питанию картофеля.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row md:shrink-0">
               <Button asChild className="h-12 rounded-[12px] bg-[#063b23] px-6 font-black text-white hover:bg-[#0d5a36] [&_*]:text-white" style={{ color: "#fff" }}>
-                <Link href="/calculator">
-                  Перейти в калькулятор
+                <Link href="/contacts">
+                  Связаться
                   <ArrowRight className="h-5 w-5 text-white" />
                 </Link>
               </Button>

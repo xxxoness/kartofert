@@ -10,6 +10,47 @@ const ProductsContext = createContext<Product[] | null>(null);
 
 export type ProductOverride = Partial<Product> & { slug: string };
 
+function parseStoredField(value: unknown): unknown {
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) return trimmed;
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    return trimmed;
+  }
+}
+
+function normalizeStoredElements(value: unknown): Product["elements"] | undefined {
+  const parsed = parseStoredField(value);
+  if (!Array.isArray(parsed)) return undefined;
+
+  const elements = parsed
+    .flatMap((item) => {
+      const normalized = parseStoredField(item);
+      return Array.isArray(normalized) ? normalized.map(parseStoredField) : [normalized];
+    })
+    .map((item) => {
+      if (typeof item === "string") {
+        const symbol = item.trim();
+        return symbol ? { symbol, label: symbol } : null;
+      }
+
+      if (item && typeof item === "object") {
+        const entry = item as Record<string, unknown>;
+        const symbol = String(entry.symbol ?? entry.name ?? entry.label ?? "").trim();
+        const label = String(entry.label ?? entry.name ?? symbol).trim();
+        const valueText = entry.value == null ? undefined : String(entry.value).trim();
+        return symbol ? { symbol, label, value: valueText || undefined } : null;
+      }
+
+      return null;
+    })
+    .filter((item): item is Product["elements"][number] => Boolean(item?.symbol));
+
+  return elements.length ? elements : undefined;
+}
+
 function readOverrides(): ProductOverride[] {
   if (typeof window === "undefined") return [];
   try {
@@ -23,7 +64,15 @@ function readOverrides(): ProductOverride[] {
 export function mergeProducts(overrides: ProductOverride[], sourceProducts: Product[] = baseProducts) {
   return sourceProducts.map((product) => {
     const override = overrides.find((item) => item.slug === product.slug);
-    return override ? ({ ...product, ...override, slug: product.slug } as Product) : product;
+    if (!override) return product;
+
+    const normalizedElements = normalizeStoredElements(override.elements);
+    return {
+      ...product,
+      ...override,
+      elements: normalizedElements ?? product.elements,
+      slug: product.slug
+    } as Product;
   });
 }
 

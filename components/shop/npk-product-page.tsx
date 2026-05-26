@@ -47,12 +47,12 @@ function calculateNeed({
   norm: number;
   unit: NormUnit;
   bagWeight: number;
-  price: number;
+  price?: number;
 }) {
   const safeArea = Number.isFinite(areaSotka) ? Math.max(areaSotka, 0) : 0;
   const safeNorm = Number.isFinite(norm) ? Math.max(norm, 0) : 0;
   const safeBagWeight = Number.isFinite(bagWeight) ? Math.max(bagWeight, 1) : 25;
-  const safePrice = Number.isFinite(price) ? Math.max(price, 0) : 0;
+  const safePrice = Number.isFinite(price ?? 0) ? Math.max(price ?? 0, 0) : 0;
   const areaM2 = safeArea * 100;
   const areaHa = safeArea / 100;
 
@@ -80,7 +80,7 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
   const [unit, setUnit] = useState<NormUnit>(product.calculatorDefaults.normUnit);
   const [bagWeight, setBagWeight] = useState(product.calculatorDefaults.bagWeight);
   const [areaSotka, setAreaSotka] = useState(product.calculatorDefaults.areaSotka);
-  const [price, setPrice] = useState(product.calculatorDefaults.price);
+  const [price, setPrice] = useState(product.calculatorDefaults.price ?? 0);
   const [toast, setToast] = useState<string | null>(null);
 
   const result = useMemo(
@@ -105,7 +105,7 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
       phone: "уточнить",
       productName: product.name,
       amount: `${formatNumber(result.needKg)} кг`,
-      total: `${formatNumber(result.cost, 0)} ₽`,
+      total: product.price ? `${formatNumber(result.cost, 0)} BYN` : "Цена уточняется",
       comment
     });
   };
@@ -126,11 +126,11 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
     const details = {
       productId: product.slug,
       name: product.name,
-      price: product.price,
+      price: product.price ?? 0,
       packageWeight: product.packageWeight,
       quantity,
       totalWeight: quantity * product.packageWeight,
-      totalPrice: quantity * product.price
+      totalPrice: quantity * (product.price ?? 0)
     };
     try {
       const key = "kartofert-cart-details";
@@ -144,7 +144,7 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
                   ...details,
                   quantity: item.quantity + quantity,
                   totalWeight: (item.quantity + quantity) * product.packageWeight,
-                  totalPrice: (item.quantity + quantity) * product.price
+                  totalPrice: (item.quantity + quantity) * (product.price ?? 0)
                 }
               : item
           )
@@ -224,12 +224,14 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
           </div>
 
           <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
-            <Button onClick={leaveRequest} className="h-12 rounded-[12px] bg-[#063b23] px-6 text-white shadow-none hover:bg-[#0d5a36]">
-              Оставить заявку
+            <Button asChild className="h-12 rounded-[12px] bg-[#063b23] px-6 text-white shadow-none hover:bg-[#0d5a36]">
+              <Link href="/contacts">
+              Связаться
               <ArrowRight className="h-5 w-5" />
+              </Link>
             </Button>
             <Button asChild variant="outline" className="h-12 rounded-[12px] border-[#f5b400] bg-white px-6 text-[#8c5b00] hover:bg-[#fff4cf]">
-              <Link href="/calculator">Рассчитать количество</Link>
+              <Link href="/contacts">Уточнить условия</Link>
             </Button>
           </div>
         </div>
@@ -259,14 +261,14 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
           {activeOrderTab === "bags" ? (
             <div className="mt-3 grid gap-3">
               <div>
-                <h2 className="text-xl font-black tracking-[-0.045em] text-[#102116]">Купить мешками</h2>
-                <p className="mt-1 text-sm font-semibold leading-5 text-[#647060]">Выберите количество мешков без расчёта по площади.</p>
+                <h2 className="text-xl font-black tracking-[-0.045em] text-[#102116]">Уточнить товар</h2>
+                <p className="mt-1 text-sm font-semibold leading-5 text-[#647060]">Свяжитесь с нами, чтобы уточнить цену, наличие и доставку.</p>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="rounded-[14px] border border-[#173c25]/10 bg-[#fffdf8] p-3">
                   <p className="text-xs font-bold text-[#647060]">Цена за мешок</p>
-                  <p className="mt-1 text-2xl font-black tracking-[-0.05em] text-[#102116]">{product.price} ₽</p>
+                  <p className="mt-1 text-2xl font-black tracking-[-0.05em] text-[#102116]">{product.priceLabel}</p>
                 </div>
                 <div className="rounded-[14px] border border-[#173c25]/10 bg-[#fffdf8] p-3">
                   <p className="text-xs font-bold text-[#647060]">Фасовка</p>
@@ -290,16 +292,16 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
                 <div className="mt-3 grid grid-cols-3 gap-2">
                   <Metric label="Количество" value={`${bagQuantity} меш.`} />
                   <Metric label="Вес" value={`${bagQuantity * product.packageWeight} кг`} />
-                  <Metric label="Итого" value={`${bagQuantity * product.price} ₽`} />
+                  <Metric label="Итого" value={product.price ? `${bagQuantity * product.price} BYN` : "уточняется"} />
                 </div>
               </div>
 
-              <Button onClick={() => addBagsToCart(bagQuantity, "direct")} className="h-11 rounded-[12px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]">
-                Добавить в корзину
+              <Button asChild className="h-11 rounded-[12px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]">
+                <Link href="/contacts">Уточнить условия</Link>
               </Button>
-              <button onClick={leaveRequest} className="rounded-[12px] border border-[#173c25]/10 bg-white px-4 py-2.5 text-sm font-black text-[#063b23] transition hover:border-[#f5b400]/70 hover:bg-[#fff8df]">
-                Оставить заявку
-              </button>
+              <Link href="/contacts" className="rounded-[12px] border border-[#173c25]/10 bg-white px-4 py-2.5 text-center text-sm font-black text-[#063b23] transition hover:border-[#f5b400]/70 hover:bg-[#fff8df]">
+                Перейти в контакты
+              </Link>
             </div>
           ) : (
             <div className="mt-3 grid gap-2.5">
@@ -332,7 +334,7 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
                   <InputWithSuffix value={areaSotka} onChange={setAreaSotka} suffix="соток" step={0.1} />
                 </CalcField>
                 <CalcField label="Цена за мешок">
-                  <InputWithSuffix value={price} onChange={setPrice} suffix="₽" />
+                  <InputWithSuffix value={price} onChange={setPrice} suffix="BYN" />
                 </CalcField>
               </div>
 
@@ -344,16 +346,16 @@ export function NpkProductPage({ product }: { product: ProductPageData }) {
                 </div>
                 <div className="mt-2 rounded-[12px] bg-white p-2.5">
                   <p className="text-xs font-bold text-[#647060]">Итого</p>
-                  <p className="text-3xl font-black tracking-[-0.05em] text-[#063b23]">{formatNumber(result.cost, 0)} ₽</p>
+                  <p className="text-3xl font-black tracking-[-0.05em] text-[#063b23]">{price > 0 ? `${formatNumber(result.cost, 0)} BYN` : "уточняется"}</p>
                 </div>
               </div>
 
-              <Button onClick={() => addBagsToCart(result.bags, "calculated")} className="h-11 rounded-[12px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]">
-                Добавить расчёт в корзину
+              <Button asChild className="h-11 rounded-[12px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]">
+                <Link href="/contacts">Уточнить условия</Link>
               </Button>
-              <button onClick={sendCalculation} className="rounded-[12px] border border-[#173c25]/10 bg-white px-4 py-2.5 text-sm font-black text-[#063b23] transition hover:border-[#f5b400]/70 hover:bg-[#fff8df]">
-                Отправить расчёт
-              </button>
+              <Link href="/contacts" className="rounded-[12px] border border-[#173c25]/10 bg-white px-4 py-2.5 text-center text-sm font-black text-[#063b23] transition hover:border-[#f5b400]/70 hover:bg-[#fff8df]">
+                Связаться
+              </Link>
               <WarningNote text={disclaimer} compact />
             </div>
           )}
@@ -694,7 +696,7 @@ function Characteristics({ product }: { product: ProductPageData }) {
               <p className="mt-0.5 text-xs font-semibold text-[#6a7469]">Основные параметры товара для сравнения и расчёта.</p>
             </div>
             <span className="hidden rounded-full border border-[#173c25]/10 px-3 py-1 text-xs font-black text-[#425045] sm:inline-flex">
-              10 ₽ / мешок
+              {product.priceLabel}
             </span>
           </div>
           <div className="overflow-hidden rounded-[14px] border border-[#173c25]/10 bg-[#fffdf8]">
@@ -828,7 +830,7 @@ function RelatedProducts({ product }: { product: ProductPageData }) {
             <h3 className="mt-1.5 line-clamp-2 text-[15px] font-black leading-tight text-[#102116]">{item.name}</h3>
             <p className="mt-1 text-xs font-bold text-[#657064]">{item.elements.map((element) => element.symbol).join(", ")} · {item.packageSize}</p>
             <div className="mt-auto flex items-center justify-between pt-2">
-              <p className="text-xl font-black tracking-[-0.05em] text-[#102116]">{item.price ?? 10} ₽</p>
+              <p className="text-xl font-black tracking-[-0.05em] text-[#102116]">{item.price ? `${item.price} BYN` : "Цена уточняется"}</p>
               <span className="grid h-9 w-9 place-items-center rounded-[11px] bg-[#063b23] text-white">
                 <ArrowRight className="h-5 w-5" />
               </span>

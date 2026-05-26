@@ -15,12 +15,13 @@ import {
   Leaf,
   Package,
   ShieldCheck,
-  ShoppingCart,
+  MessageCircle,
   Sprout,
   Wheat
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { products } from "@/data/products";
+import { formatProductPrice } from "@/data/products";
+import { getPublishedProducts } from "@/lib/products";
 
 const heroImage = "/assets/hero/hero-potato-fertilizers.png";
 const hasHeroImage = existsSync(join(process.cwd(), "public", heroImage.slice(1)));
@@ -72,15 +73,6 @@ const categories = [
 ];
 
 const popularSlugs = ["npk-potato", "sulfate-potassium", "kalimagnesia", "ammonium-sulfate", "borofoska"];
-const popularProducts = popularSlugs
-  .map((slug) => products.find((product) => product.slug === slug))
-  .filter((product): product is (typeof products)[number] => Boolean(product))
-  .map((product) => ({
-    name: product.name,
-    price: `${product.price ?? 10} ₽`,
-    image: `/assets/products/${product.slug}/front.png`,
-    href: `/products/${product.slug}`
-  }));
 
 const articles = [
   {
@@ -103,7 +95,18 @@ const articles = [
   }
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const products = await getPublishedProducts();
+  const popularProducts = popularSlugs
+    .map((slug) => products.find((product) => product.slug === slug))
+    .filter((product): product is (typeof products)[number] => Boolean(product))
+    .map((product) => ({
+      name: product.name,
+      price: formatProductPrice(product),
+      image: `/assets/products/${product.slug}/front.png`,
+      href: `/products/${product.slug}`
+    }));
+
   return (
     <main className="overflow-hidden bg-[#FAF7EF]">
       <section className="mx-auto w-full max-w-[1440px] px-4 pb-4 pt-10 sm:px-6 md:pt-12 lg:px-8 lg:pb-7 lg:pt-14">
@@ -123,8 +126,8 @@ export default function HomePage() {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-14 w-full rounded-[13px] border-[#f2b600] bg-white/80 px-7 text-base font-black text-[#9a6400] shadow-none hover:bg-[#fff4cf] sm:w-auto sm:px-8">
-                <Link href="/calculator">
-                  Рассчитать количество
+                <Link href="/contacts">
+                  Уточнить условия
                   <Calculator className="h-5 w-5" />
                 </Link>
               </Button>
@@ -225,7 +228,7 @@ export default function HomePage() {
               <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-[#eef5e8] text-[#063b23]">
                 <Calculator className="h-5 w-5" />
               </span>
-              <h2 className="text-[25px] font-black tracking-[-0.04em] text-[#102116]">Калькулятор расчёта</h2>
+              <h2 className="text-[25px] font-black tracking-[-0.04em] text-[#102116]">Помощь с расчётом</h2>
             </div>
 
             <div className="grid gap-2.5">
@@ -255,9 +258,9 @@ export default function HomePage() {
               </div>
 
               <Button asChild className="mt-0.5 h-12 rounded-[10px] bg-[#f5b400] text-base font-black text-[#1b1500] shadow-none hover:bg-[#e8a900]">
-                <Link href="/calculator">
+                <Link href="/contacts">
                   <Calculator className="h-5 w-5" />
-                  Рассчитать количество
+                  Связаться
                 </Link>
               </Button>
 
@@ -341,7 +344,7 @@ function ProductShelfCard({
         <div className="mt-2.5 flex items-center justify-between gap-3">
           <span className="text-[22px] font-black leading-none text-[#102116]">{product.price}</span>
           <span className="grid h-11 w-11 place-items-center rounded-[12px] bg-[#063b23] text-white">
-            <ShoppingCart className="h-[18px] w-[18px]" />
+            <MessageCircle className="h-[18px] w-[18px]" />
           </span>
         </div>
       </div>

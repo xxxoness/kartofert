@@ -7,5 +7,5 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatPrice(value?: number) {
   if (typeof value !== "number") return "Цена по запросу";
-  return `${value.toLocaleString("ru-RU")} ₽`;
+  return `${value.toLocaleString("ru-RU")} BYN`;
 }

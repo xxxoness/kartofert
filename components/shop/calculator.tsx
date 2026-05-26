@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Calculator as CalculatorIcon, Save, ShieldCheck, ShoppingCart } from "lucide-react";
+import { Calculator as CalculatorIcon, MessageCircle, Save, ShieldCheck } from "lucide-react";
 import { Product, products as baseProducts } from "@/data/products";
 import {
   calculateScheme,
@@ -50,7 +50,7 @@ const variantMeta: Record<SchemeVariant, { title: string; subtitle: string; pric
   economy: {
     title: "Эконом",
     subtitle: "Базовое питание",
-    priceLabel: "от 40 ₽",
+    priceLabel: "по запросу",
     items: [
       { slug: "npk-potato", role: "Основное питание", rateFactor: 0.55 },
       { slug: "diammofoska", role: "Стартовое питание", rateFactor: 0.42 }
@@ -59,7 +59,7 @@ const variantMeta: Record<SchemeVariant, { title: string; subtitle: string; pric
   optimum: {
     title: "Оптимум",
     subtitle: "Сбалансированное питание",
-    priceLabel: "от 50 ₽",
+    priceLabel: "по запросу",
     items: [
       { slug: "diammofoska", role: "Стартовое питание", rateFactor: 0.42 },
       { slug: "npk-potato", role: "Основное питание", rateFactor: 0.55 },
@@ -70,7 +70,7 @@ const variantMeta: Record<SchemeVariant, { title: string; subtitle: string; pric
   premium: {
     title: "Премиум",
     subtitle: "Расширенная схема питания",
-    priceLabel: "от 65 ₽",
+    priceLabel: "по запросу",
     items: [
       { slug: "diammofoska", role: "Стартовое питание", rateFactor: 0.48 },
       { slug: "npk-potato", role: "Основное питание", rateFactor: 0.62 },
@@ -102,7 +102,7 @@ export function Calculator() {
   const [norm, setNorm] = useState(String(selectedProduct.defaultNorm));
   const [normUnit, setNormUnit] = useState<NormUnit>(selectedProduct.normUnit);
   const [bagWeight, setBagWeight] = useState(String(selectedProduct.bagWeight));
-  const [price, setPrice] = useState(String(selectedProduct.price ?? 10));
+  const [price, setPrice] = useState(String(selectedProduct.price ?? 0));
   const [status, setStatus] = useState("");
 
   useEffect(() => {
@@ -111,7 +111,7 @@ export function Calculator() {
       setNormUnit(selectedProduct.normUnit);
     }
     setBagWeight(String(selectedProduct.bagWeight));
-    setPrice(String(selectedProduct.price ?? 10));
+    setPrice(String(selectedProduct.price ?? 0));
   }, [normMode, selectedProduct]);
 
   const areaValidation = useMemo(
@@ -563,7 +563,7 @@ function HowItWorks() {
           "Укажите площадь",
           "Выберите режим",
           "Получите расчёт",
-          "Добавьте в корзину"
+          "Свяжитесь с нами"
         ].map((item, index) => (
           <div key={item} className="flex items-center gap-2 text-sm font-black text-[#384334]">
             <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#fff8df] text-xs text-[#8c5b00]">
@@ -635,9 +635,11 @@ function SchemeResultCard({
 
       <TotalsBlock totals={totals} status={status} />
       <div className="relative z-10 mt-3 grid gap-3 sm:grid-cols-2">
-        <Button onClick={onAdd} disabled={!canSubmit} className="h-12 rounded-[13px] bg-[#f5b400] text-base font-black text-[#1b1500] shadow-none hover:bg-[#e8a900] disabled:opacity-60">
-          <ShoppingCart className="h-5 w-5" />
-          Добавить схему в корзину
+        <Button asChild disabled={!canSubmit} className="h-12 rounded-[13px] bg-[#f5b400] text-base font-black text-[#1b1500] shadow-none hover:bg-[#e8a900] disabled:opacity-60">
+          <Link href="/contacts">
+            <MessageCircle className="h-5 w-5" />
+            Уточнить условия
+          </Link>
         </Button>
         <Button onClick={onSave} disabled={!canSubmit} variant="outline" className="h-12 rounded-[13px] border-[#063b23]/25 bg-white text-base font-black text-[#063b23] shadow-none hover:bg-[#f7f1e5] disabled:opacity-60">
           <Save className="h-5 w-5" />
@@ -693,9 +695,11 @@ function SingleResultCard({
 
       <TotalsBlock totals={totals} status={status} />
       <div className="relative z-10 mt-3 grid gap-3 sm:grid-cols-2">
-        <Button onClick={onAdd} disabled={!canSubmit} className="h-12 rounded-[13px] bg-[#f5b400] text-base font-black text-[#1b1500] shadow-none hover:bg-[#e8a900] disabled:opacity-60">
-          <ShoppingCart className="h-5 w-5" />
-          Добавить товар в корзину
+        <Button asChild disabled={!canSubmit} className="h-12 rounded-[13px] bg-[#f5b400] text-base font-black text-[#1b1500] shadow-none hover:bg-[#e8a900] disabled:opacity-60">
+          <Link href="/contacts">
+            <MessageCircle className="h-5 w-5" />
+            Уточнить условия
+          </Link>
         </Button>
         <Button onClick={onSave} disabled={!canSubmit} variant="outline" className="h-12 rounded-[13px] border-[#063b23]/25 bg-white text-base font-black text-[#063b23] shadow-none hover:bg-[#f7f1e5] disabled:opacity-60">
           <Save className="h-5 w-5" />
@@ -723,7 +727,7 @@ function TotalsBlock({ totals, status }: { totals: { bags: number; weight: numbe
       <div className="grid gap-3 sm:grid-cols-3">
         <Metric label="Количество мешков" value={totals.bags.toString()} suffix={declineBag(totals.bags)} />
         <Metric label="Общий вес" value={formatKg(totals.weight)} suffix="кг" />
-        <Metric label="Стоимость" value={formatPrice(totals.cost)} suffix="₽" />
+        <Metric label="Стоимость" value={totals.cost > 0 ? formatPrice(totals.cost) : "уточняется"} suffix={totals.cost > 0 ? "BYN" : ""} />
       </div>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <span className="rounded-full bg-[#eef6e9] px-3 py-1.5 text-xs font-black text-[#063b23]">Расчёт выполнен по выбранным параметрам</span>

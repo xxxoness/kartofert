@@ -28,6 +28,14 @@ type SupabaseProductRow = {
   deleted_at?: string | null;
 };
 
+type NutrientLike = {
+  symbol?: unknown;
+  label?: unknown;
+  name?: unknown;
+  value?: unknown;
+  percent?: unknown;
+};
+
 function asNumber(value: Prisma.Decimal | number | null | undefined) {
   if (value == null) return undefined;
   return typeof value === "number" ? value : Number(value.toString());
@@ -36,6 +44,7 @@ function asNumber(value: Prisma.Decimal | number | null | undefined) {
 export function dbProductToProduct(row: NonNullable<DbProduct>): Product {
   const legacy = (row.legacy && typeof row.legacy === "object" ? row.legacy : {}) as Partial<Product>;
   const price = row.priceMode === "request" ? undefined : asNumber(row.price);
+  const elements = normalizeElements(row.nutrients);
 
   return {
     ...legacy,
@@ -47,8 +56,8 @@ export function dbProductToProduct(row: NonNullable<DbProduct>): Product {
     fertilizerType: row.type ?? legacy.fertilizerType ?? row.category,
     typeGroup: legacy.typeGroup ?? row.category,
     tasks: legacy.tasks ?? (row.task ? row.task.split(",").map((item) => item.trim()).filter(Boolean) : []),
-    elements: (Array.isArray(row.nutrients) ? row.nutrients : legacy.elements ?? []) as Product["elements"],
-    stage: legacy.stage ?? (row.stage ? row.stage.split(",").map((item) => item.trim()).filter(Boolean) : []),
+    elements: elements.length ? elements : legacy.elements ?? [],
+    stage: legacy.stage ?? formatStages(row.stage),
     packageSize: legacy.packageSize ?? `${row.packageWeightKg} кг`,
     bagWeight: row.packageWeightKg,
     price,
@@ -73,12 +82,97 @@ export function dbProductToProduct(row: NonNullable<DbProduct>): Product {
   } as Product;
 }
 
-function normalizeElements(value: SupabaseProductRow["nutrients"]): Product["elements"] {
-  if (!Array.isArray(value)) return [];
-  return value.map((item) => {
-    if (typeof item === "string") return { symbol: item, label: item };
-    return item;
-  });
+export function parseProductField(value: unknown): unknown {
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) return trimmed;
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    return trimmed;
+  }
+}
+
+function normalizeElements(value: unknown): Product["elements"] {
+  const parsed = parseProductField(value);
+  const items = Array.isArray(parsed) ? parsed : parsed ? [parsed] : [];
+
+  return items
+    .flatMap((item) => {
+      const normalized = parseProductField(item);
+      return Array.isArray(normalized) ? normalized.map(parseProductField) : [normalized];
+    })
+    .map((item) => {
+      if (typeof item === "string") {
+        const clean = item.trim();
+        return clean ? { symbol: clean, label: clean } : null;
+      }
+
+      if (item && typeof item === "object") {
+        const nutrient = item as NutrientLike;
+        const symbol = stringValue(nutrient.symbol) || stringValue(nutrient.name) || stringValue(nutrient.label);
+        const label = stringValue(nutrient.label) || stringValue(nutrient.name) || symbol;
+        const value = stringValue(nutrient.value) || stringValue(nutrient.percent);
+        return symbol ? { symbol, label, value } : null;
+      }
+
+      return null;
+    })
+    .filter((item): item is Product["elements"][number] => Boolean(item?.symbol));
+}
+
+export function formatNutrients(value: unknown, mode: "symbols" | "full" = "symbols") {
+  return normalizeElements(value)
+    .map((element) => {
+      if (mode === "full") return `${element.label}${element.value ? ` ${element.value}` : ""}`;
+      return element.symbol;
+    })
+    .filter(Boolean)
+    .join(", ");
+}
+
+export function formatStages(value: unknown) {
+  const parsed = parseProductField(value);
+  if (Array.isArray(parsed)) {
+    return parsed
+      .flatMap((item) => {
+        const normalized = parseProductField(item);
+        return Array.isArray(normalized) ? normalized : [normalized];
+      })
+      .map((item) => String(item).trim())
+      .filter(Boolean);
+  }
+  if (typeof parsed === "string") return parsed.split(",").map((item) => item.trim()).filter(Boolean);
+  return [];
+}
+
+export function formatProductSpecs(value: unknown) {
+  const parsed = parseProductField(value);
+  if (!parsed) return [];
+  if (Array.isArray(parsed)) {
+    return parsed
+      .map((item) => parseProductField(item))
+      .map((item) => {
+        if (typeof item === "string") return item;
+        if (item && typeof item === "object") {
+          const entry = item as Record<string, unknown>;
+          const label = stringValue(entry.label) || stringValue(entry.title) || stringValue(entry.name);
+          const text = stringValue(entry.value) || stringValue(entry.text) || stringValue(entry.description);
+          return [label, text].filter(Boolean).join(": ");
+        }
+        return "";
+      })
+      .filter(Boolean);
+  }
+  if (typeof parsed === "string") return [parsed];
+  if (typeof parsed === "object") return Object.entries(parsed).map(([key, item]) => `${key}: ${String(item)}`);
+  return [];
+}
+
+function stringValue(value: unknown) {
+  return typeof value === "string" || typeof value === "number" ? String(value).trim() : "";
 }
 
 function packageWeightNumber(value?: string | null) {
@@ -103,7 +197,7 @@ export function supabaseProductToProduct(row: SupabaseProductRow, showPrices = t
     typeGroup: row.category ?? staticProduct?.typeGroup ?? "Удобрения",
     tasks: staticProduct?.tasks ?? [],
     elements: normalizeElements(row.nutrients).length ? normalizeElements(row.nutrients) : staticProduct?.elements ?? [],
-    stage: row.growing_stages ?? staticProduct?.stage ?? [],
+    stage: formatStages(row.growing_stages).length ? formatStages(row.growing_stages) : staticProduct?.stage ?? [],
     packageSize: row.package_weight ?? staticProduct?.packageSize ?? `${packageWeight} кг`,
     bagWeight: packageWeight,
     price,
@@ -183,7 +277,8 @@ export async function getPublishedProducts() {
         .order("sort_order", { ascending: true })
         .order("title", { ascending: true });
       if (error) throw error;
-      return (data ?? []).map((row) => supabaseProductToProduct(row as SupabaseProductRow));
+      const showPrices = await readShowPrices(supabase);
+      return (data ?? []).map((row) => supabaseProductToProduct(row as SupabaseProductRow, showPrices));
     } catch (error) {
       console.error("[supabase products]", error);
     }
@@ -318,7 +413,7 @@ function supabaseProductToAdminRow(row: SupabaseProductRow) {
     shortDescription: row.short_description ?? "",
     category: row.category ?? "",
     type: row.category ?? "",
-    stage: (row.growing_stages ?? []).join(", "),
+    stage: formatStages(row.growing_stages).join(", "),
     task: product.tasks.join(", "),
     nutrients: normalizeElements(row.nutrients),
     composition: null,

@@ -3,10 +3,9 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, PackageCheck, Ruler, ShoppingCart, Sprout, WalletCards } from "lucide-react";
+import { ArrowRight, CheckCircle2, MessageCircle, PackageCheck, Ruler, Sprout, WalletCards } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Product } from "@/data/products";
-import { useCart } from "@/components/shop/cart-provider";
+import { Product, formatProductPrice } from "@/data/products";
 import { useProductsStore } from "@/components/shop/product-store";
 
 type StageKey = "soil" | "planting" | "vegetation" | "tubers" | "before-harvest";
@@ -72,7 +71,6 @@ function productImage(slug: string) {
 export function FertilizersPage() {
   const [activeStage, setActiveStage] = useState<StageKey>("planting");
   const { products } = useProductsStore();
-  const { addItem } = useCart();
   const selectedStage = stages.find((stage) => stage.key === activeStage) ?? stages[0];
 
   const recommendedProducts = useMemo(() => {
@@ -96,7 +94,7 @@ export function FertilizersPage() {
 
         <section className="mt-4 rounded-[26px] border border-[#173c25]/10 bg-[#fffdf8]/68 p-3 shadow-[0_14px_40px_rgba(45,35,17,.045)] md:p-4">
           <StageSelector activeStage={activeStage} onChange={setActiveStage} />
-          <RecommendedProducts products={recommendedProducts} stage={selectedStage} onAdd={addItem} />
+          <RecommendedProducts products={recommendedProducts} stage={selectedStage} />
         </section>
 
         <HelpCta stage={selectedStage} />
@@ -126,7 +124,7 @@ function Hero() {
             </Link>
           </Button>
           <Button asChild variant="outline" className="h-[52px] rounded-[13px] border-[#f5b400] bg-[#fffdf8] px-7 text-[#8c5b00] shadow-none hover:bg-[#fff4cf]">
-            <Link href="/calculator">Рассчитать количество</Link>
+            <Link href="/contacts">Уточнить условия</Link>
           </Button>
         </div>
       </div>
@@ -186,7 +184,7 @@ function StageSelector({ activeStage, onChange }: { activeStage: StageKey; onCha
   );
 }
 
-function RecommendedProducts({ products, stage, onAdd }: { products: Product[]; stage: StageConfig; onAdd: (product: Product) => void }) {
+function RecommendedProducts({ products, stage }: { products: Product[]; stage: StageConfig }) {
   return (
     <div className="mt-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -202,14 +200,14 @@ function RecommendedProducts({ products, stage, onAdd }: { products: Product[]; 
 
       <div className="mt-3 grid gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
         {products.map((product) => (
-          <StageProductCard key={product.slug} product={product} onAdd={onAdd} />
+          <StageProductCard key={product.slug} product={product} />
         ))}
       </div>
     </div>
   );
 }
 
-function StageProductCard({ product, onAdd }: { product: Product; onAdd: (product: Product) => void }) {
+function StageProductCard({ product }: { product: Product }) {
   const elements = product.elements.map((element) => element.symbol).join(", ");
 
   return (
@@ -233,20 +231,17 @@ function StageProductCard({ product, onAdd }: { product: Product; onAdd: (produc
       </Link>
       <div className="mt-auto flex items-center justify-between gap-2.5 pt-2.5">
         <div className="min-w-[66px]">
-          <p className="text-xl font-black tracking-[-0.04em] text-[#102116]">{product.price ?? 10} ₽</p>
+          <p className="text-xl font-black tracking-[-0.04em] text-[#102116]">{formatProductPrice(product)}</p>
           <p className="text-[11px] font-semibold text-[#7a8373]">за мешок</p>
         </div>
         <div className="flex min-w-0 gap-2">
           <Button asChild variant="outline" className="h-10 rounded-[11px] border-[#063b23]/25 bg-white px-3 text-xs font-black text-[#063b23] shadow-none hover:bg-[#f3faed]">
             <Link href={`/products/${product.slug}`}>Подробнее</Link>
           </Button>
-          <Button
-            type="button"
-            onClick={() => onAdd(product)}
-            className="h-10 w-10 shrink-0 rounded-[11px] bg-[#063b23] p-0 text-white shadow-none hover:bg-[#0d5a36]"
-            aria-label={`Добавить в корзину ${product.name}`}
-          >
-            <ShoppingCart className="h-4 w-4" />
+          <Button asChild className="h-10 w-10 shrink-0 rounded-[11px] bg-[#063b23] p-0 text-white shadow-none hover:bg-[#0d5a36]" aria-label={`Связаться по товару ${product.name}`}>
+            <Link href="/contacts">
+              <MessageCircle className="h-4 w-4" />
+            </Link>
           </Button>
         </div>
       </div>
@@ -270,12 +265,12 @@ function HelpCta({ stage }: { stage: StageConfig }) {
           <p className="text-xs font-black uppercase tracking-[0.16em] text-[#8c5b00]">Подбор по этапу: {stage.title}</p>
           <h2 className="mt-1 text-2xl font-black tracking-[-0.04em] text-[#102116]">Не знаете, что выбрать?</h2>
           <p className="mt-1.5 text-sm font-semibold leading-6 text-[#596553]">
-            Рассчитайте оптимальную схему питания под вашу задачу и получите точный результат.
+            Напишите нам — поможем подобрать удобрения под задачу, площадь и этап выращивания.
           </p>
         </div>
         <Button asChild className="h-11 rounded-[12px] bg-[#f5b400] px-6 text-[#1b1500] shadow-none hover:bg-[#e8a900]">
-          <Link href="/calculator">
-            Перейти в калькулятор <ArrowRight className="h-5 w-5" />
+          <Link href="/contacts">
+            Связаться <ArrowRight className="h-5 w-5" />
           </Link>
         </Button>
       </div>

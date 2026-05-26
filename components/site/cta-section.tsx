@@ -41,7 +41,7 @@ export function CTASection({
               </Button>
             ) : (
               <Button asChild size="lg" variant="secondary">
-                <Link href="/calculator">Рассчитать норму внесения</Link>
+                <Link href="/contacts">Уточнить условия</Link>
               </Button>
             )}
           </div>

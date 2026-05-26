@@ -15,7 +15,7 @@ export async function Footer() {
           <div>
             <Logo />
             <p className="mt-4 max-w-sm text-sm leading-6 text-[#596553]">
-              KartoFert — удобный магазин удобрений для картофеля. Каталог, расчёт количества, корзина и оформление заказа без лишней сложности.
+              KartoFert — каталог удобрений для картофеля, подбор по задаче и понятная связь для уточнения условий.
             </p>
             <Button asChild className="mt-5 rounded-[10px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]">
               <Link href="/products">Перейти в каталог</Link>
@@ -29,10 +29,9 @@ export async function Footer() {
             ))}
           </FooterColumn>
           <FooterColumn title="Покупателям">
-            <Link href="/calculator">Калькулятор</Link>
-            <Link href="/cart">Корзина</Link>
-            <Link href="/checkout">Оформление заказа</Link>
             <Link href="/delivery">Доставка и оплата</Link>
+            <Link href="/contacts">Контакты</Link>
+            <Link href="/documents">Документы на продукцию</Link>
             <Link href="/faq">Вопросы и ответы</Link>
           </FooterColumn>
           <FooterColumn title="Компания">

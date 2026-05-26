@@ -3,18 +3,16 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, Search, ShoppingCart, UserRound } from "lucide-react";
+import { Menu, MessageCircle, Search, UserRound } from "lucide-react";
 import { navItems } from "@/data/categories";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "@/components/shop/logo";
-import { useCart } from "@/components/shop/cart-provider";
 
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const { count } = useCart();
   const [query, setQuery] = useState("");
 
   const submitSearch = (event: FormEvent) => {
@@ -69,11 +67,8 @@ export function Header() {
               Войти
             </Link>
           </Button>
-          <Link href="/cart" className="relative grid h-10 w-10 place-items-center rounded-[12px] text-[#071a10] transition hover:bg-[#f0eadc]" aria-label="Корзина">
-            <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -right-1 -top-1 grid h-6 min-w-6 place-items-center rounded-full bg-[#f5b400] px-1 text-xs font-black text-[#1a1400]">
-              {count || 0}
-            </span>
+          <Link href="/contacts" className="relative grid h-10 w-10 place-items-center rounded-[12px] text-[#071a10] transition hover:bg-[#f0eadc]" aria-label="Связаться">
+            <MessageCircle className="h-5 w-5" />
           </Link>
         </div>
 
@@ -109,8 +104,8 @@ export function Header() {
                   </SheetClose>
                 ))}
                 <SheetClose asChild>
-                  <Link href="/cart" className="rounded-[14px] bg-[#f5b400] px-4 py-3 text-base font-black text-[#1a1400]">
-                    Корзина {count ? `(${count})` : ""}
+                  <Link href="/contacts" className="rounded-[14px] bg-[#f5b400] px-4 py-3 text-base font-black text-[#1a1400]">
+                    Связаться
                   </Link>
                 </SheetClose>
               </nav>

@@ -3,10 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Heart, SlidersHorizontal, Grid2X2, List, Search, ShoppingCart, X } from "lucide-react";
+import { Heart, SlidersHorizontal, Grid2X2, List, Search, MessageCircle, X } from "lucide-react";
 import { Product, elements, formatProductPrice, stages, tasks } from "@/data/products";
 import { Button } from "@/components/ui/button";
-import { useCart } from "@/components/shop/cart-provider";
 import { useProductsStore } from "@/components/shop/product-store";
 
 const typeLabels = ["Комплексные NPK", "Азотные", "Фосфорные", "Калийные", "Микроудобрения", "Улучшители почвы", "Натуральные"];
@@ -192,7 +191,7 @@ export function ProductFilters({ initialSearch = "", initialType = "" }: { initi
             <div className="mt-3 h-2 rounded-full bg-[#f0eadc]">
               <div className="h-2 w-full rounded-full bg-[#f5b400]" />
             </div>
-            <p className="mt-2 text-xs font-bold text-[#7b8476]">Цена временно: 10 ₽ за мешок</p>
+            <p className="mt-2 text-xs font-bold text-[#7b8476]">Цены уточняются по запросу</p>
           </FilterSection>
           <Button type="button" onClick={resetFilters} variant="outline" className="mt-5 h-11 w-full rounded-[12px] border-[#173c25]/10 bg-[#fffdf8] text-[#063b23] shadow-none hover:bg-[#fff4cf]">
             Сбросить фильтры
@@ -203,7 +202,7 @@ export function ProductFilters({ initialSearch = "", initialType = "" }: { initi
       <section className={filtersVisible ? "" : "lg:col-span-2"}>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[16px] border border-[#173c25]/10 bg-[#fffdf8] px-5 py-3 text-sm font-bold text-[#596553] shadow-[0_12px_30px_rgba(45,35,17,.045)]">
           <span>Найдено товаров: {filtered.length}</span>
-          <span>Цена временно: 10 ₽ за мешок</span>
+          <span>Цены уточняются по запросу</span>
         </div>
         {filtered.length ? (
           <div className={view === "grid" ? "grid justify-start gap-5 sm:grid-cols-2 xl:grid-cols-4" : "grid gap-5 md:grid-cols-2"}>
@@ -260,7 +259,6 @@ function FilterCheck({ label, checked, onChange, count }: { label: string; check
 
 function CatalogProductCard({ product: initialProduct }: { product: Product }) {
   const { getProduct } = useProductsStore();
-  const { addItem } = useCart();
   const product = getProduct(initialProduct.slug) ?? initialProduct;
   const image = productImages[product.slug];
   const elementLine = product.elements
@@ -298,20 +296,20 @@ function CatalogProductCard({ product: initialProduct }: { product: Product }) {
         <div className="mt-auto pt-2.5">
           <div className="mb-2.5 flex items-end justify-between gap-3">
             <p className="text-[24px] font-black tracking-[-0.04em] text-[#071a10]">{formatProductPrice(product)}</p>
-            <button
-              onClick={() => addItem(product)}
+            <Link
+              href="/contacts"
               className="grid h-11 w-11 place-items-center rounded-[12px] bg-[#063b23] text-white transition hover:bg-[#0d5a36]"
-              aria-label="Добавить в корзину"
+              aria-label="Связаться"
             >
-              <ShoppingCart className="h-[18px] w-[18px]" />
-            </button>
+              <MessageCircle className="h-[18px] w-[18px]" />
+            </Link>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <Button asChild variant="outline" className="h-10 rounded-[10px] border-[#1c4a2e]/35 bg-white text-[#063b23] hover:bg-[#f1f5ea]">
               <Link href={`/products/${product.slug}`}>Подробнее</Link>
             </Button>
             <Button asChild className="h-10 rounded-[10px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]">
-              <Link href={`/calculator?product=${product.slug}`}>Рассчитать</Link>
+              <Link href="/contacts">Связаться</Link>
             </Button>
           </div>
         </div>

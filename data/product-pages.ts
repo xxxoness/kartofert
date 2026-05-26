@@ -1,5 +1,5 @@
 import { articles } from "@/data/articles";
-import { findProduct, products, Product } from "@/data/products";
+import { findProduct, formatProductPrice, products, Product } from "@/data/products";
 
 export type ProductPageImage = {
   id: string;
@@ -25,7 +25,8 @@ export type ProductPageData = {
   form: string;
   nutrients: ProductPageNutrient[];
   packageWeight: number;
-  price: number;
+  price?: number;
+  priceLabel: string;
   availability: string;
   usageStages: string[];
   tasks: string[];
@@ -37,7 +38,7 @@ export type ProductPageData = {
     normUnit: "кг/га" | "г/м²" | "кг/сотка";
     bagWeight: number;
     areaSotka: number;
-    price: number;
+    price?: number;
   };
   images: ProductPageImage[];
   passport?: {
@@ -128,7 +129,7 @@ function buildCharacteristics(product: Product) {
     { label: "Назначение", value: product.shortDescription },
     { label: "Этап применения", value: stageText(product) },
     { label: "Фасовка", value: product.packageSize },
-    { label: "Цена", value: `${product.price ?? 10} ₽ / мешок` },
+    { label: "Цена", value: formatProductPrice(product) },
     { label: "Наличие", value: product.inStock ? "Уточняется" : "Под заказ" },
     { label: "Единица расчёта", value: "г/м², кг/га, кг/сотка" },
     { label: "Примечание", value: "Норма подбирается по площади, анализу почвы и технологии выращивания." }
@@ -197,7 +198,8 @@ export function toProductPageData(product: Product): ProductPageData {
     form: "Гранулы",
     nutrients,
     packageWeight: product.bagWeight,
-    price: product.price ?? 10,
+    price: product.price,
+    priceLabel: formatProductPrice(product),
     availability: product.inStock ? "Уточняется" : "Под заказ",
     usageStages: product.stage,
     tasks: [...product.tasks.slice(0, 3), product.packageSize],
@@ -214,7 +216,7 @@ export function toProductPageData(product: Product): ProductPageData {
       normUnit: product.normUnit,
       bagWeight: product.bagWeight,
       areaSotka: 10,
-      price: product.price ?? 10
+      price: product.price
     },
     images: buildImages(product),
     passport: { available: false },
@@ -224,8 +226,8 @@ export function toProductPageData(product: Product): ProductPageData {
       "Выберите товар",
       "Укажите площадь участка",
       "Рассчитайте количество",
-      "Отправьте заявку",
-      "Менеджер уточнит цену, наличие и доставку"
+      "Свяжитесь с KartoFert",
+      "Уточним цену, наличие и доставку"
     ],
     relatedProducts: (relatedMap[product.slug] ?? products.filter((item) => item.slug !== product.slug).slice(0, 4).map((item) => item.slug)).filter(
       (slug) => slug !== product.slug && Boolean(findProduct(slug))

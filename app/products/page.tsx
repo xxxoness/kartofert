@@ -69,9 +69,9 @@ export default async function ProductsPage({
           <Link href="/contacts" className="inline-flex h-12 items-center justify-center rounded-[12px] bg-[#063b23] px-6 text-sm font-black text-white shadow-[0_14px_30px_rgba(6,59,35,.16)] transition hover:bg-[#0d5a36]">
             Подобрать по задаче
           </Link>
-          <Link href="/calculator" className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-[#f5b400] bg-[#fffdf8] px-6 text-sm font-black text-[#8a5a00] transition hover:bg-[#fff4cf]">
+          <Link href="/contacts" className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-[#f5b400] bg-[#fffdf8] px-6 text-sm font-black text-[#8a5a00] transition hover:bg-[#fff4cf]">
             <Calculator className="h-4 w-4" />
-            Рассчитать норму
+            Уточнить условия
           </Link>
         </div>
       </section>

@@ -127,7 +127,7 @@ export default function DeliveryPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-12 rounded-[12px] border-[#f5b400] bg-white px-6 font-black text-[#102116] hover:bg-[#fff6d8]">
-                <Link href="/calculator">Рассчитать количество</Link>
+                <Link href="/contacts">Уточнить условия</Link>
               </Button>
             </div>
           </div>
@@ -246,7 +246,7 @@ export default function DeliveryPage() {
               Готовы оформить заказ?
             </h2>
             <p className="mt-3 text-base leading-7 text-[#66705f]">
-              Перейдите в каталог, выберите удобрения для картофеля и добавьте нужные позиции в корзину.
+              Перейдите в каталог, выберите удобрения для картофеля и свяжитесь с нами для уточнения условий.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Button asChild className="h-12 rounded-[12px] bg-[#063b23] px-6 font-black text-white hover:bg-[#0d5a36] [&_*]:text-white" style={{ color: "#fff" }}>
@@ -256,7 +256,7 @@ export default function DeliveryPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-12 rounded-[12px] border-[#f5b400] bg-white px-6 font-black text-[#102116] hover:bg-[#fff6d8]">
-                <Link href="/calculator">Рассчитать количество</Link>
+                <Link href="/contacts">Уточнить условия</Link>
               </Button>
             </div>
           </div>

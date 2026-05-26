@@ -300,7 +300,7 @@ export function ContactsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-12 rounded-[12px] border-[#f5b400] bg-white px-6 font-black text-[#102116] hover:bg-[#fff6d8]">
-                <Link href="/calculator">Рассчитать количество</Link>
+                <Link href="/products">Смотреть каталог</Link>
               </Button>
             </div>
           </div>

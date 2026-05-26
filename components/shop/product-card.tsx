@@ -1,16 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, MessageCircle } from "lucide-react";
 import { Product, formatProductPrice } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { ProductBagVisual } from "@/components/shop/product-bag-visual";
-import { useCart } from "@/components/shop/cart-provider";
 import { useProductsStore } from "@/components/shop/product-store";
 
 export function ProductCard({ product: initialProduct }: { product: Product }) {
   const { getProduct } = useProductsStore();
-  const { addItem } = useCart();
   const product = getProduct(initialProduct.slug) ?? initialProduct;
   const elementLine = product.elements
     .slice(0, 4)
@@ -43,20 +41,16 @@ export function ProductCard({ product: initialProduct }: { product: Product }) {
         <div className="mt-auto pt-4">
           <div className="mb-4 flex items-end justify-between gap-3">
             <p className="text-[22px] font-black tracking-[-0.04em] text-[#071a10]">{formatProductPrice(product)}</p>
-            <button
-              onClick={() => addItem(product)}
-              className="grid h-9 w-9 place-items-center rounded-[9px] bg-[#063b23] text-white transition hover:bg-[#0d5a36]"
-              aria-label="Добавить в корзину"
-            >
-              <ShoppingCart className="h-4 w-4" />
-            </button>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <Button asChild variant="outline" className="h-10 rounded-[8px] border-[#1c4a2e]/45 bg-white text-[#063b23] hover:bg-[#f1f5ea]">
               <Link href={`/products/${product.slug}`}>Подробнее</Link>
             </Button>
             <Button asChild className="h-10 rounded-[8px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]">
-              <Link href={`/calculator?product=${product.slug}`}>Рассчитать</Link>
+              <Link href="/contacts">
+                <MessageCircle className="h-4 w-4" />
+                Связаться
+              </Link>
             </Button>
           </div>
         </div>
