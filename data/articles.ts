@@ -166,15 +166,6 @@ export const articles: Article[] = [
     focus: "Для покупки важен простой перевод нормы в мешки: это экономит бюджет и место хранения."
   }),
   article({
-    slug: "kak-podgotovit-klubni-k-hraneniyu",
-    title: "Как подготовить клубни к хранению и сохранить качество",
-    category: "Хранение",
-    date: "2 мая 2026",
-    excerpt: "Что влияет на лёжкость клубней после уборки и как уменьшить потери при хранении.",
-    relatedProductSlugs: ["sulfate-potassium", "kalimagnesia", "wood-ash"],
-    focus: "На хранение влияет не только уборка, но и баланс питания в сезон: избыток азота и нехватка калия могут ухудшить качество клубней."
-  }),
-  article({
     slug: "mozhno-li-sypat-zolu-pri-posadke-kartofelya",
     title: "Можно ли сыпать золу при посадке картофеля",
     category: "Натуральные",

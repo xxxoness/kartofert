@@ -16,20 +16,20 @@ export const metadata: Metadata = {
     canonical: "/"
   },
   title: {
-    default: `${siteConfig.brandName} вЂ” СѓРґРѕР±СЂРµРЅРёСЏ РґР»СЏ РєР°СЂС‚РѕС„РµР»СЏ СЃ СЂР°СЃС‡С‘С‚РѕРј`,
+    default: `${siteConfig.brandName} — удобрения для картофеля с расчётом`,
     template: `%s | ${siteConfig.brandName}`
   },
   description: siteConfig.siteDescription,
   keywords: [
-    "СѓРґРѕР±СЂРµРЅРёСЏ РґР»СЏ РєР°СЂС‚РѕС„РµР»СЏ",
+    "удобрения для картофеля",
     "KartoFert",
-    "РєР°Р»СЊРєСѓР»СЏС‚РѕСЂ СѓРґРѕР±СЂРµРЅРёР№",
-    "СЃСѓР»СЊС„Р°С‚ РєР°Р»РёСЏ",
-    "РєР°Р»РёРјР°РіРЅРµР·РёСЏ",
-    "Р±РѕСЂРѕС„РѕСЃРєР°"
+    "калькулятор удобрений",
+    "сульфат калия",
+    "калимагнезия",
+    "борофоска"
   ],
   openGraph: {
-    title: `${siteConfig.brandName} вЂ” РјР°РіР°Р·РёРЅ СѓРґРѕР±СЂРµРЅРёР№ РґР»СЏ РєР°СЂС‚РѕС„РµР»СЏ`,
+    title: `${siteConfig.brandName} — магазин удобрений для картофеля`,
     description: siteConfig.siteDescription,
     url: siteUrl,
     siteName: siteConfig.brandName,

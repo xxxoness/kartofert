@@ -1,8 +1,8 @@
-import { Product, products } from "@/data/products";
+import { products } from "@/data/products";
 import { siteConfig } from "@/config/site";
 
 export type AreaMode = "sotka" | "hectare";
-export type NormUnit = Product["normUnit"] | "кг/га" | "г/м²" | "кг/сотка";
+export type NormUnit = "кг/га" | "г/м²" | "кг/сотка";
 export type NormMode = "culture" | "manual";
 
 export type CalculatorValidation = {
