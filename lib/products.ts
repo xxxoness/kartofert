@@ -49,6 +49,7 @@ export function dbProductToProduct(row: NonNullable<DbProduct>): Product {
   return {
     ...legacy,
     slug: row.slug,
+    id: row.id,
     name: row.title,
     shortName: row.shortTitle ?? legacy.shortName ?? row.title,
     brand: legacy.brand ?? "KartoFert",
@@ -61,6 +62,11 @@ export function dbProductToProduct(row: NonNullable<DbProduct>): Product {
     packageSize: legacy.packageSize ?? `${row.packageWeightKg} кг`,
     bagWeight: row.packageWeightKg,
     price,
+    priceLabel: price ? `${price} ${row.currency}` : "Цена уточняется",
+    priceMode: row.priceMode,
+    currency: row.currency ?? "BYN",
+    image: row.image,
+    imageUrl: row.image,
     formula: legacy.formula,
     bagTitle: legacy.bagTitle ?? row.shortTitle ?? row.title,
     bagSubtitle: legacy.bagSubtitle ?? row.category,
@@ -205,6 +211,7 @@ export function supabaseProductToProduct(row: SupabaseProductRow, showPrices = t
     description: row.description ?? staticProduct?.description ?? "",
     mainAction: row.short_description ?? staticProduct?.mainAction ?? "",
     inStock: row.in_stock ?? true,
+    isPublished: row.is_published ?? true,
     bagTitle: staticProduct?.bagTitle ?? row.title,
     bagSubtitle: staticProduct?.bagSubtitle ?? row.category ?? "KartoFert"
   } as Product;

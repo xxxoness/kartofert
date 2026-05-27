@@ -25,11 +25,14 @@ export function dbArticleToArticle(row: NonNullable<DbArticle>): Article {
   const legacy = (row.legacy && typeof row.legacy === "object" ? row.legacy : {}) as Partial<Article>;
 
   return {
+    id: row.id,
     slug: row.slug,
     title: row.title,
     category: row.category,
     readTime: row.readTime ?? legacy.readTime ?? "7 минут",
     date: row.publishedAt ? row.publishedAt.toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" }) : legacy.date ?? "",
+    coverImage: legacy.coverImage,
+    featured: row.isFeatured,
     excerpt: row.excerpt,
     content: row.content,
     sections: legacy.sections ?? [],
@@ -44,6 +47,7 @@ export function dbArticleToArticle(row: NonNullable<DbArticle>): Article {
 function supabaseArticleToArticle(row: SupabaseArticleRow): Article {
   const legacy = staticArticles.find((article) => article.slug === row.slug);
   return {
+    id: row.id,
     slug: row.slug,
     title: row.title,
     category: row.category,
@@ -51,6 +55,8 @@ function supabaseArticleToArticle(row: SupabaseArticleRow): Article {
     date: row.published_at
       ? new Date(row.published_at).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })
       : legacy?.date ?? "",
+    coverImage: row.cover_image_url ?? legacy?.coverImage,
+    featured: row.is_featured ?? false,
     excerpt: row.excerpt,
     content: row.content,
     sections: legacy?.sections ?? [],
@@ -152,9 +158,9 @@ export async function getAdminArticles() {
       slug: article.slug,
       title: article.title,
       excerpt: article.excerpt,
-      content: article.sections.map((section) => `## ${section.heading}\n\n${section.paragraphs.join("\n\n")}`).join("\n\n"),
+      content: article.content,
       category: article.category,
-      coverImage: "/assets/images/knowledge-base/articles/kb-article-potato-growth-stage.png",
+      coverImage: article.coverImage ?? "/assets/images/knowledge-base/articles/kb-article-potato-growth-stage.png",
       readTime: article.readTime,
       publishedAt: new Date(),
       status: "published",

@@ -14,6 +14,8 @@ type KnowledgeArticle = Article & {
 };
 
 type ArticleCard = {
+  id?: string;
+  slug: string;
   title: string;
   description: string;
   category: string;
@@ -22,10 +24,13 @@ type ArticleCard = {
   date: string;
   readTime: string;
   href: string;
+  featured?: boolean;
 };
 
 function toArticleCard(article: KnowledgeArticle): ArticleCard {
   return {
+    id: article.id,
+    slug: article.slug,
     title: article.title,
     description: article.excerpt,
     category: article.category,
@@ -33,8 +38,18 @@ function toArticleCard(article: KnowledgeArticle): ArticleCard {
     image: article.coverImage ?? "/assets/images/knowledge-base/articles/kb-article-potato-growth-stage.png",
     date: article.date,
     readTime: article.readTime,
-    href: `/knowledge/${article.slug}`
+    href: `/knowledge/${article.slug}`,
+    featured: article.featured
   };
+}
+
+function uniqueCardsBySlug(cards: ArticleCard[]) {
+  const seen = new Set<string>();
+  return cards.filter((card) => {
+    if (seen.has(card.slug)) return false;
+    seen.add(card.slug);
+    return true;
+  });
 }
 
 const categories = ["Все статьи", "Посадка", "Питание", "Калий", "Ошибки", "Расчёт", "Хранение"];
@@ -46,20 +61,9 @@ const heroBenefits = [
   { icon: Calculator, label: "Практика и расчёты" }
 ];
 
-const featuredArticle: ArticleCard = {
-  category: "Рекомендуем",
-  filterCategory: "Питание",
-  title: "Весенняя схема питания картофеля от посадки до цветения",
-  description:
-    "Пошаговая схема внесения удобрений по фазам роста: какие элементы важны на старте, а какие — в период бутонизации и цветения.",
-  image: "/assets/images/knowledge-base/articles/kb-article-potato-growth-stage.png",
-  date: "16 мая 2026",
-  readTime: "9 минут",
-  href: "/knowledge/kakie-udobreniya-nuzhny-kartofelyu-vesnoy"
-};
-
 const articleCards: ArticleCard[] = [
   {
+    slug: "kaliy-dlya-kartofelya",
     category: "Питание",
     filterCategory: "Питание",
     title: "Калий для картофеля: роль, источники и признаки дефицита",
@@ -70,6 +74,7 @@ const articleCards: ArticleCard[] = [
     href: "/knowledge/kaliy-dlya-kartofelya"
   },
   {
+    slug: "sulfat-ammoniya-dlya-kartofelya",
     category: "Азот",
     filterCategory: "Питание",
     title: "Сульфат аммония: когда и как правильно вносить",
@@ -80,6 +85,7 @@ const articleCards: ArticleCard[] = [
     href: "/knowledge/sulfat-ammoniya-dlya-kartofelya"
   },
   {
+    slug: "chto-vnesti-pri-posadke-kartofelya",
     category: "Посадка",
     filterCategory: "Посадка",
     title: "Что внести при посадке: NPK, зола или сульфат калия?",
@@ -90,6 +96,7 @@ const articleCards: ArticleCard[] = [
     href: "/knowledge/chto-vnesti-pri-posadke-kartofelya"
   },
   {
+    slug: "pochemu-kartofel-uhodit-v-botvu",
     category: "Ошибки",
     filterCategory: "Ошибки",
     title: "Почему картофель уходит в ботву, а клубней мало",
@@ -100,6 +107,7 @@ const articleCards: ArticleCard[] = [
     href: "/knowledge/pochemu-kartofel-uhodit-v-botvu"
   },
   {
+    slug: "kak-rasschitat-udobreniya-na-sotki-i-gektary",
     category: "Расчёт",
     filterCategory: "Расчёт",
     title: "Как рассчитать удобрения для картофеля на сотки и гектары",
@@ -110,6 +118,7 @@ const articleCards: ArticleCard[] = [
     href: "/knowledge/kak-rasschitat-udobreniya-na-sotki-i-gektary"
   },
   {
+    slug: "kak-podgotovit-klubni-k-hraneniyu",
     category: "Хранение",
     filterCategory: "Хранение",
     title: "Как подготовить клубни к хранению и сохранить качество",
@@ -150,16 +159,15 @@ const utilityCards = [
 
 export function KnowledgeBasePage({ articles }: { articles?: KnowledgeArticle[] }) {
   const [activeCategory, setActiveCategory] = useState("Все статьи");
-  const cards = useMemo(() => (articles?.length ? articles.map(toArticleCard) : articleCards), [articles]);
-  const featured = useMemo(() => (articles?.length ? articles.find((article) => article.featured) : null), [articles]);
-  const activeFeatured = featured ? toArticleCard(featured) : featuredArticle;
+  const cards = useMemo(() => uniqueCardsBySlug(articles?.length ? articles.map(toArticleCard) : articleCards), [articles]);
+  const activeFeatured = useMemo(() => cards.find((article) => article.featured) ?? null, [cards]);
 
-  const visibleFeatured = activeCategory === "Все статьи" || activeFeatured.filterCategory === activeCategory;
+  const visibleFeatured = Boolean(activeFeatured) && (activeCategory === "Все статьи" || activeFeatured?.filterCategory === activeCategory);
   const filteredArticles = useMemo(() => {
-    const source = cards.filter((article) => article.href !== activeFeatured.href);
+    const source = activeFeatured ? cards.filter((article) => article.slug !== activeFeatured.slug) : cards;
     if (activeCategory === "Все статьи") return source;
     return source.filter((article) => article.filterCategory === activeCategory);
-  }, [activeCategory, cards, activeFeatured.href]);
+  }, [activeCategory, cards, activeFeatured]);
 
   return (
     <main className="overflow-hidden bg-[#fbf7ec] text-[#102116]">
@@ -234,7 +242,7 @@ export function KnowledgeBasePage({ articles }: { articles?: KnowledgeArticle[] 
           </div>
         ) : (
           <div className={cn("grid gap-5", visibleFeatured && "xl:grid-cols-[1.05fr_2fr]")}>
-            {visibleFeatured && <FeaturedCard article={activeFeatured} />}
+            {visibleFeatured && activeFeatured && <FeaturedCard article={activeFeatured} />}
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {filteredArticles.map((article) => (
                 <ArticleTile key={article.title} article={article} />

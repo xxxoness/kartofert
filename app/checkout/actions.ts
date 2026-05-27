@@ -1,6 +1,7 @@
 "use server";
 
 import { Prisma } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 import { prisma, withDatabase } from "@/lib/db";
 import { createSupabaseAdminClient, hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 
@@ -38,6 +39,8 @@ export async function createCheckoutOrder(input: {
         .select("*")
         .single();
       if (error) throw error;
+      revalidatePath("/admin/orders");
+      revalidatePath("/admin");
       return data;
     } catch (error) {
       console.error("[supabase checkout order]", error);
@@ -46,8 +49,8 @@ export async function createCheckoutOrder(input: {
   }
 
   return withDatabase(
-    async () =>
-      prisma.order.create({
+    async () => {
+      const order = await prisma.order.create({
         data: {
           orderNumber: input.orderNumber,
           customerName: input.customerName,
@@ -62,7 +65,11 @@ export async function createCheckoutOrder(input: {
           status: "new",
           paymentStatus: "pending"
         }
-      }),
+      });
+      revalidatePath("/admin/orders");
+      revalidatePath("/admin");
+      return order;
+    },
     null
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { products, formatProductPrice } from "@/data/products";
+import { products } from "@/data/products";
+import { formatBuyPrice } from "@/lib/cart-utils";
 import { ProductBagVisual } from "@/components/shop/product-bag-visual";
 import { Button } from "@/components/ui/button";
 
@@ -17,7 +18,7 @@ export default function ComparePage() {
     ["Норма", (product) => product.recommendedRange],
     ["Этап", (product) => product.stage.join(", ")],
     ["Фасовка", (product) => product.packageSize],
-    ["Цена", (product) => formatProductPrice(product)]
+    ["Цена", (product) => formatBuyPrice(product)]
   ];
 
   return (

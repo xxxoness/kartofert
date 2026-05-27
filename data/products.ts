@@ -5,6 +5,7 @@ export type NutritionElement = {
 };
 
 export type Product = {
+  id?: string;
   slug: string;
   name: string;
   shortName: string;
@@ -18,6 +19,12 @@ export type Product = {
   packageSize: string;
   bagWeight: number;
   price?: number;
+  priceLabel?: string | null;
+  priceMode?: string | null;
+  currency?: string;
+  image?: string | null;
+  imageUrl?: string | null;
+  isPublished?: boolean;
   formula?: string;
   bagTitle: string;
   bagSubtitle: string;

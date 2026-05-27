@@ -43,6 +43,9 @@ export function ArticleForm({ article }: { article?: ArticleFormRow | null }) {
         <input name="isFeatured" type="checkbox" defaultChecked={article?.isFeatured ?? false} className="h-4 w-4 accent-[#063b23]" />
         Рекомендуемая статья
       </label>
+      <p className="-mt-2 text-xs font-semibold leading-5 text-[#6b765f]">
+        Если включить этот флаг, статья станет главной карточкой на странице базы знаний, а у остальных статей флаг будет снят.
+      </p>
 
       <div className="flex flex-col gap-3 border-t border-[#173c25]/10 pt-5 sm:flex-row">
         <button className="h-12 rounded-[14px] bg-[#063b23] px-7 text-sm font-black text-white transition hover:bg-[#0d5a36]">Сохранить</button>

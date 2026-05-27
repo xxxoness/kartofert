@@ -3,17 +3,19 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, MessageCircle, Search, UserRound } from "lucide-react";
+import { Menu, Search, ShoppingCart, UserRound } from "lucide-react";
 import { navItems } from "@/data/categories";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "@/components/shop/logo";
+import { useCart } from "@/components/shop/cart-provider";
 
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const { count } = useCart();
 
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
@@ -21,6 +23,12 @@ export function Header() {
     if (query.trim()) params.set("search", query.trim());
     router.push(`/products${params.toString() ? `?${params.toString()}` : ""}`);
   };
+
+  const cartBadge = count > 0 ? (
+    <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#f5b400] px-1 text-[11px] font-black text-[#1b1500]">
+      {count}
+    </span>
+  ) : null;
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#173c25]/10 bg-[#fffdf7]/94 backdrop-blur-2xl">
@@ -67,12 +75,17 @@ export function Header() {
               Войти
             </Link>
           </Button>
-          <Link href="/contacts" className="relative grid h-10 w-10 place-items-center rounded-[12px] text-[#071a10] transition hover:bg-[#f0eadc]" aria-label="Связаться">
-            <MessageCircle className="h-5 w-5" />
+          <Link href="/cart" className="relative grid h-10 w-10 place-items-center rounded-[12px] text-[#071a10] transition hover:bg-[#f0eadc]" aria-label="Корзина">
+            <ShoppingCart className="h-5 w-5" />
+            {cartBadge}
           </Link>
         </div>
 
         <div className="ml-auto flex shrink-0 items-center lg:hidden">
+          <Link href="/cart" className="relative mr-2 grid h-10 w-10 place-items-center rounded-[12px] text-[#071a10] transition hover:bg-[#f0eadc]" aria-label="Корзина">
+            <ShoppingCart className="h-5 w-5" />
+            {cartBadge}
+          </Link>
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="dark" size="icon" className="bg-[#063b23] text-white hover:bg-[#0d5a36]" aria-label="Открыть меню">
@@ -104,8 +117,8 @@ export function Header() {
                   </SheetClose>
                 ))}
                 <SheetClose asChild>
-                  <Link href="/contacts" className="rounded-[14px] bg-[#f5b400] px-4 py-3 text-base font-black text-[#1a1400]">
-                    Связаться
+                  <Link href="/cart" className="rounded-[14px] bg-[#f5b400] px-4 py-3 text-base font-black text-[#1a1400]">
+                    Корзина{count > 0 ? ` (${count})` : ""}
                   </Link>
                 </SheetClose>
               </nav>

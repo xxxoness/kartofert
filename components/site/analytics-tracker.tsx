@@ -6,13 +6,14 @@ import { usePathname } from "next/navigation";
 export const analyticsConsentKey = "kartofert_cookie_consent";
 const consentEventName = "kartofert-cookie-consent-changed";
 
-type AnalyticsEventName = "page_view" | "product_view" | "contact_form_submit" | "add_to_cart" | "error";
+type AnalyticsEventName = "page_view" | "product_view" | "contact_form_submit" | "add_to_cart" | "remove_from_cart" | "cart_quantity_change" | "checkout_submit" | "error";
 
 type AnalyticsPayload = {
   eventName: AnalyticsEventName;
   path?: string;
   productSlug?: string;
   payload?: Record<string, unknown>;
+  requireConsent?: boolean;
 };
 
 export function notifyAnalyticsConsentChanged(value: "accepted" | "declined") {
@@ -26,13 +27,14 @@ export function hasAnalyticsConsent() {
 }
 
 export function trackAnalyticsEvent(event: AnalyticsPayload) {
-  if (typeof window === "undefined" || !hasAnalyticsConsent()) return;
+  if (typeof window === "undefined") return;
+  if (event.requireConsent !== false && !hasAnalyticsConsent()) return;
 
   const body = JSON.stringify({
     eventName: event.eventName,
     path: event.path ?? `${window.location.pathname}${window.location.search}`,
     productSlug: event.productSlug,
-    payload: sanitizePayload(event.payload)
+    payload: sanitizePayload({ ...event.payload, session_id: getAnalyticsSessionId() })
   });
 
   try {
@@ -62,6 +64,7 @@ export function AnalyticsTracker() {
       if (!hasAnalyticsConsent()) return;
       const search = window.location.search;
       const path = `${pathname}${search ? `?${search}` : ""}`;
+      if (pathname.startsWith("/admin") || pathname.startsWith("/api")) return;
       if (lastTrackedPath.current === path) return;
       lastTrackedPath.current = path;
 
@@ -130,4 +133,13 @@ function sanitizePayload(payload: AnalyticsPayload["payload"]) {
   if (!payload) return undefined;
   const blockedKeys = new Set(["name", "email", "phone", "tel", "message", "comment", "customerName", "customerEmail", "customerPhone"]);
   return Object.fromEntries(Object.entries(payload).filter(([key]) => !blockedKeys.has(key)));
+}
+
+function getAnalyticsSessionId() {
+  const key = "kartofert_analytics_session_id";
+  const existing = window.localStorage.getItem(key);
+  if (existing) return existing;
+  const next = window.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  window.localStorage.setItem(key, next);
+  return next;
 }

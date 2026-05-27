@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Heart, SlidersHorizontal, Grid2X2, List, Search, MessageCircle, X } from "lucide-react";
-import { Product, elements, formatProductPrice, stages, tasks } from "@/data/products";
+import { Product, elements, stages, tasks } from "@/data/products";
+import { formatBuyPrice } from "@/lib/cart-utils";
 import { Button } from "@/components/ui/button";
 import { useProductsStore } from "@/components/shop/product-store";
 
@@ -295,7 +296,7 @@ function CatalogProductCard({ product: initialProduct }: { product: Product }) {
 
         <div className="mt-auto pt-2.5">
           <div className="mb-2.5 flex items-end justify-between gap-3">
-            <p className="text-[24px] font-black tracking-[-0.04em] text-[#071a10]">{formatProductPrice(product)}</p>
+            <p className="text-[24px] font-black tracking-[-0.04em] text-[#071a10]">{formatBuyPrice(product)}</p>
             <Link
               href="/contacts"
               className="grid h-11 w-11 place-items-center rounded-[12px] bg-[#063b23] text-white transition hover:bg-[#0d5a36]"

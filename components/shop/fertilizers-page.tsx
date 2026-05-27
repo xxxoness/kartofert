@@ -5,7 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, MessageCircle, PackageCheck, Ruler, Sprout, WalletCards } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Product, formatProductPrice } from "@/data/products";
+import { Product } from "@/data/products";
+import { formatBuyPrice } from "@/lib/cart-utils";
 import { useProductsStore } from "@/components/shop/product-store";
 
 type StageKey = "soil" | "planting" | "vegetation" | "tubers" | "before-harvest";
@@ -231,7 +232,7 @@ function StageProductCard({ product }: { product: Product }) {
       </Link>
       <div className="mt-auto flex items-center justify-between gap-2.5 pt-2.5">
         <div className="min-w-[66px]">
-          <p className="text-xl font-black tracking-[-0.04em] text-[#102116]">{formatProductPrice(product)}</p>
+          <p className="text-xl font-black tracking-[-0.04em] text-[#102116]">{formatBuyPrice(product)}</p>
           <p className="text-[11px] font-semibold text-[#7a8373]">за мешок</p>
         </div>
         <div className="flex min-w-0 gap-2">

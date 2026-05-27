@@ -252,9 +252,13 @@ function articlePayloadSupabase(formData: FormData) {
 export async function createArticleAction(formData: FormData) {
   const admin = await requireAdmin();
   ensureStorage();
+  const payload = articlePayload(formData);
 
   if (hasSupabaseAdminEnv) {
     const supabase = createSupabaseAdminClient();
+    if (payload.isFeatured) {
+      await supabase.from("articles").update({ is_featured: false, updated_at: new Date().toISOString() }).neq("slug", payload.slug);
+    }
     const { data, error } = await supabase.from("articles").insert(articlePayloadSupabase(formData)).select("*").single();
     if (error) throw new Error(error.message);
     await createAdminLog({ action: "article.create", entityType: "article", entityId: data.id, message: `${admin.email} создал статью ${data.title}` });
@@ -262,7 +266,10 @@ export async function createArticleAction(formData: FormData) {
     redirect("/admin/articles");
   }
 
-  const article = await prisma.article.create({ data: articlePayload(formData) });
+  if (payload.isFeatured) {
+    await prisma.article.updateMany({ data: { isFeatured: false } });
+  }
+  const article = await prisma.article.create({ data: payload });
   await createAdminLog({ action: "article.create", entityType: "article", entityId: article.id, message: `${admin.email} создал статью ${article.title}` });
   revalidateArticlePaths(article.slug);
   redirect("/admin/articles");
@@ -271,10 +278,14 @@ export async function createArticleAction(formData: FormData) {
 export async function updateArticleAction(id: string, formData: FormData) {
   const admin = await requireAdmin();
   ensureStorage();
+  const payload = articlePayload(formData);
 
   if (hasSupabaseAdminEnv) {
     const supabase = createSupabaseAdminClient();
     const { data: previous } = await supabase.from("articles").select("*").eq("id", id).maybeSingle();
+    if (payload.isFeatured) {
+      await supabase.from("articles").update({ is_featured: false, updated_at: new Date().toISOString() }).neq("id", id);
+    }
     const { data, error } = await supabase.from("articles").update(articlePayloadSupabase(formData)).eq("id", id).select("*").single();
     if (error) throw new Error(error.message);
     await createAdminLog({
@@ -289,7 +300,10 @@ export async function updateArticleAction(id: string, formData: FormData) {
   }
 
   const previous = await prisma.article.findUnique({ where: { id } });
-  const article = await prisma.article.update({ where: { id }, data: articlePayload(formData) });
+  if (payload.isFeatured) {
+    await prisma.article.updateMany({ where: { id: { not: id } }, data: { isFeatured: false } });
+  }
+  const article = await prisma.article.update({ where: { id }, data: payload });
   await createAdminLog({
     action: "article.update",
     entityType: "article",

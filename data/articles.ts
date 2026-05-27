@@ -1,9 +1,12 @@
 export type Article = {
+  id?: string;
   slug: string;
   title: string;
   category: string;
   readTime: string;
   date: string;
+  coverImage?: string;
+  featured?: boolean;
   excerpt: string;
   content: string;
   sections: { heading: string; paragraphs: string[] }[];

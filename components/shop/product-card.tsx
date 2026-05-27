@@ -1,15 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, MessageCircle } from "lucide-react";
-import { Product, formatProductPrice } from "@/data/products";
+import { Heart, ShoppingCart } from "lucide-react";
+import { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { ProductBagVisual } from "@/components/shop/product-bag-visual";
 import { useProductsStore } from "@/components/shop/product-store";
+import { useCart } from "@/components/shop/cart-provider";
+import { trackAnalyticsEvent } from "@/components/site/analytics-tracker";
+import { canBuyProduct, formatBuyPrice } from "@/lib/cart-utils";
 
 export function ProductCard({ product: initialProduct }: { product: Product }) {
   const { getProduct } = useProductsStore();
+  const { addItem } = useCart();
   const product = getProduct(initialProduct.slug) ?? initialProduct;
+  const canBuy = canBuyProduct(product);
   const elementLine = product.elements
     .slice(0, 4)
     .map((element) => `${element.symbol}${element.value ? ` ${element.value}` : ""}`)
@@ -40,18 +45,28 @@ export function ProductCard({ product: initialProduct }: { product: Product }) {
 
         <div className="mt-auto pt-4">
           <div className="mb-4 flex items-end justify-between gap-3">
-            <p className="text-[22px] font-black tracking-[-0.04em] text-[#071a10]">{formatProductPrice(product)}</p>
+            <p className="text-[22px] font-black tracking-[-0.04em] text-[#071a10]">{formatBuyPrice(product)}</p>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <Button asChild variant="outline" className="h-10 rounded-[8px] border-[#1c4a2e]/45 bg-white text-[#063b23] hover:bg-[#f1f5ea]">
               <Link href={`/products/${product.slug}`}>Подробнее</Link>
             </Button>
-            <Button asChild className="h-10 rounded-[8px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]">
-              <Link href="/contacts">
-                <MessageCircle className="h-4 w-4" />
-                Связаться
-              </Link>
-            </Button>
+            {canBuy ? (
+              <Button
+                className="h-10 rounded-[8px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]"
+                onClick={() => {
+                  addItem(product);
+                  trackAnalyticsEvent({ eventName: "add_to_cart", productSlug: product.slug, payload: { source: "product_card" }, requireConsent: false });
+                }}
+              >
+                <ShoppingCart className="h-4 w-4" />
+                В корзину
+              </Button>
+            ) : (
+              <Button asChild className="h-10 rounded-[8px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]">
+                <Link href="/contacts">Уточнить</Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>

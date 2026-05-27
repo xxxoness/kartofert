@@ -3,9 +3,15 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Product } from "@/data/products";
 import { useProductsStore } from "@/components/shop/product-store";
+import { canBuyProduct, productImageUrl } from "@/lib/cart-utils";
 
 export type CartLine = {
+  id?: string;
   slug: string;
+  name?: string;
+  image?: string;
+  price?: number;
+  currency?: string;
   quantity: number;
 };
 
@@ -43,15 +49,28 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       count: lines.reduce((sum, line) => sum + line.quantity, 0),
       total: lines.reduce((sum, line) => {
         const product = getProduct(line.slug);
+        if (!canBuyProduct(product)) return sum;
         return sum + (product?.price ?? 0) * line.quantity;
       }, 0),
       addItem(product) {
+        if (!canBuyProduct(product)) return;
         setLines((current) => {
           const existing = current.find((line) => line.slug === product.slug);
           if (existing) {
             return current.map((line) => (line.slug === product.slug ? { ...line, quantity: line.quantity + 1 } : line));
           }
-          return [...current, { slug: product.slug, quantity: 1 }];
+          return [
+            ...current,
+            {
+              id: product.id,
+              slug: product.slug,
+              name: product.name,
+              image: productImageUrl(product),
+              price: product.price,
+              currency: product.currency ?? "BYN",
+              quantity: 1
+            }
+          ];
         });
       },
       removeItem(slug) {

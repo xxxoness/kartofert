@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       metadata?: unknown;
     };
 
-    const allowedEvents = new Set(["page_view", "product_view", "contact_form_submit", "add_to_cart", "error", "checkout_start"]);
+    const allowedEvents = new Set(["page_view", "product_view", "contact_form_submit", "add_to_cart", "remove_from_cart", "cart_quantity_change", "checkout_submit", "error", "checkout_start"]);
     if (!body.eventName || !allowedEvents.has(body.eventName)) {
       return NextResponse.json({ ok: false, error: "eventName is required" }, { status: 400 });
     }

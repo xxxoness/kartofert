@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Calculator, ChevronRight, Download, Leaf, PackageCheck, ShieldCheck, ShoppingCart } from "lucide-react";
-import { Product, formatProductPrice } from "@/data/products";
+import { Product } from "@/data/products";
 import { Article } from "@/data/articles";
 import { calculateFertilizer } from "@/data/calculator-rules";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ import { ProductCard } from "@/components/shop/product-card";
 import { useCart } from "@/components/shop/cart-provider";
 import { useProductsStore } from "@/components/shop/product-store";
 import { addLead } from "@/components/shop/leads-store";
+import { trackAnalyticsEvent } from "@/components/site/analytics-tracker";
+import { canBuyProduct, formatBuyPrice } from "@/lib/cart-utils";
 
 export function ProductDetail({
   product: initialProduct,
@@ -25,6 +27,7 @@ export function ProductDetail({
   const { getProduct } = useProductsStore();
   const { addItem } = useCart();
   const product = getProduct(initialProduct.slug) ?? initialProduct;
+  const canBuy = canBuyProduct(product);
   const [norm, setNorm] = useState(product.defaultNorm);
   const [unit, setUnit] = useState(product.normUnit);
   const [area, setArea] = useState(1);
@@ -45,7 +48,9 @@ export function ProductDetail({
   );
 
   const addRequest = () => {
+    if (!canBuy) return;
     addItem(product);
+    trackAnalyticsEvent({ eventName: "add_to_cart", productSlug: product.slug, payload: { source: "product_detail" }, requireConsent: false });
     addLead({
       source: "товар",
       name: "Покупатель",
@@ -157,7 +162,7 @@ export function ProductDetail({
                 <Metric label="Удобрения нужно" value={`${result.needKg.toLocaleString("ru-RU", { maximumFractionDigits: 1 })} кг`} />
                 <Metric label="Количество мешков" value={`${result.bags} шт.`} />
               </div>
-              <p className="mt-4 text-xs font-semibold text-[#596553]">Цена за мешок: {formatProductPrice(product)}</p>
+              <p className="mt-4 text-xs font-semibold text-[#596553]">Цена за мешок: {formatBuyPrice(product)}</p>
               <div className="mt-3 border-t border-[#173c25]/10 pt-3">
                 <p className="text-xs font-semibold text-[#596553]">Итого к оплате</p>
                 <p className="text-3xl font-black tracking-[-0.05em] text-[#063b23]">

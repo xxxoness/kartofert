@@ -20,7 +20,7 @@ import {
   Wheat
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatProductPrice } from "@/data/products";
+import { formatBuyPrice } from "@/lib/cart-utils";
 import { getPublishedProducts } from "@/lib/products";
 
 const heroImage = "/assets/hero/hero-potato-fertilizers.png";
@@ -102,7 +102,7 @@ export default async function HomePage() {
     .filter((product): product is (typeof products)[number] => Boolean(product))
     .map((product) => ({
       name: product.name,
-      price: formatProductPrice(product),
+      price: formatBuyPrice(product),
       image: `/assets/products/${product.slug}/front.png`,
       href: `/products/${product.slug}`
     }));
