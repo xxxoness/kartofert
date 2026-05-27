@@ -120,6 +120,22 @@ select {
   scrollbar-width: none;
 }
 
+.article-prose > * + * {
+  margin-top: 1.15rem;
+}
+
+.article-prose h2 {
+  margin-top: 2.75rem;
+}
+
+.article-prose h2:first-child {
+  margin-top: 0;
+}
+
+.article-prose h3 {
+  margin-top: 2rem;
+}
+
 @media (max-width: 640px) {
   .container-shell {
     width: min(100% - 24px, 1180px);
