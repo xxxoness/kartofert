@@ -18,7 +18,7 @@ export function ProductCard({ product: initialProduct }: { product: Product }) {
   const elementLine = product.elements
     .slice(0, 4)
     .map((element) => `${element.symbol}${element.value ? ` ${element.value}` : ""}`)
-    .join("  •  ");
+    .join(" • ");
 
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-[18px] border border-[#173c25]/10 bg-white shadow-[0_16px_42px_rgba(45,35,17,.06)] transition duration-300 hover:-translate-y-1 hover:border-[#f5b400]/55 hover:shadow-[0_24px_70px_rgba(45,35,17,.12)]">
@@ -56,7 +56,20 @@ export function ProductCard({ product: initialProduct }: { product: Product }) {
                 className="h-10 rounded-[8px] bg-[#f5b400] text-[#1b1500] shadow-none hover:bg-[#e8a900]"
                 onClick={() => {
                   addItem(product);
-                  trackAnalyticsEvent({ eventName: "add_to_cart", productSlug: product.slug, payload: { source: "product_card" }, requireConsent: false });
+                  void trackAnalyticsEvent({
+                    eventName: "add_to_cart",
+                    productSlug: product.slug,
+                    payload: {
+                      product_id: product.id ?? product.slug,
+                      slug: product.slug,
+                      name: product.name,
+                      price: product.price,
+                      quantity: 1,
+                      total: product.price ?? 0,
+                      source: "product_card"
+                    },
+                    requireConsent: false
+                  });
                 }}
               >
                 <ShoppingCart className="h-4 w-4" />

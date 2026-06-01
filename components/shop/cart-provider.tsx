@@ -19,7 +19,7 @@ type CartContextValue = {
   lines: CartLine[];
   count: number;
   total: number;
-  addItem: (product: Product) => void;
+  addItem: (product: Product, quantity?: number) => void;
   removeItem: (slug: string) => void;
   updateQuantity: (slug: string, quantity: number) => void;
   clearCart: () => void;
@@ -52,12 +52,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (!canBuyProduct(product)) return sum;
         return sum + (product?.price ?? 0) * line.quantity;
       }, 0),
-      addItem(product) {
+      addItem(product, quantity = 1) {
         if (!canBuyProduct(product)) return;
+        const safeQuantity = Math.max(1, Math.ceil(Number(quantity) || 1));
         setLines((current) => {
           const existing = current.find((line) => line.slug === product.slug);
           if (existing) {
-            return current.map((line) => (line.slug === product.slug ? { ...line, quantity: line.quantity + 1 } : line));
+            return current.map((line) =>
+              line.slug === product.slug ? { ...line, quantity: line.quantity + safeQuantity } : line
+            );
           }
           return [
             ...current,
@@ -68,7 +71,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               image: productImageUrl(product),
               price: product.price,
               currency: product.currency ?? "BYN",
-              quantity: 1
+              quantity: safeQuantity
             }
           ];
         });

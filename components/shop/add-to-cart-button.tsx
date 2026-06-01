@@ -24,7 +24,20 @@ export function AddToCartButton({
     <Button
       onClick={() => {
         addItem(product);
-        trackAnalyticsEvent({ eventName: "add_to_cart", productSlug: product.slug, payload: { source: "product_button" }, requireConsent: false });
+        void trackAnalyticsEvent({
+          eventName: "add_to_cart",
+          productSlug: product.slug,
+          payload: {
+            product_id: product.id ?? product.slug,
+            slug: product.slug,
+            name: product.name,
+            price: product.price,
+            quantity: 1,
+            total: product.price ?? 0,
+            source: "product_button"
+          },
+          requireConsent: false
+        });
       }}
       className={cn("bg-[#063b23] text-white hover:bg-[#0d5a36]", className)}
     >

@@ -1,5 +1,7 @@
 import type { Product } from "@/data/products";
 
+const requestPriceLabels = ["цена уточняется", "по запросу"];
+
 export function canBuyProduct(product?: Partial<Product> | null) {
   if (!product) return false;
   const label = String(product.priceLabel ?? "").toLowerCase();
@@ -12,8 +14,8 @@ export function canBuyProduct(product?: Partial<Product> | null) {
     Number.isFinite(product.price) &&
     product.price > 0 &&
     mode !== "request" &&
-    !label.includes("цена уточняется") &&
-    !label.includes("по запросу")
+    mode !== "hidden" &&
+    !requestPriceLabels.some((requestLabel) => label.includes(requestLabel))
   );
 }
 

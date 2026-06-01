@@ -15,6 +15,7 @@ export type ProductPageNutrient = {
 };
 
 export type ProductPageData = {
+  id?: string;
   slug: string;
   name: string;
   category: string;
@@ -27,6 +28,10 @@ export type ProductPageData = {
   packageWeight: number;
   price?: number;
   priceLabel: string;
+  priceMode?: string | null;
+  currency?: string;
+  inStock?: boolean;
+  isPublished?: boolean;
   availability: string;
   usageStages: string[];
   tasks: string[];
@@ -188,6 +193,7 @@ function buildRelatedArticles(product: Product) {
 export function toProductPageData(product: Product): ProductPageData {
   const nutrients = buildNutrients(product);
   return {
+    id: product.id,
     slug: product.slug,
     name: product.name,
     category: product.category,
@@ -200,6 +206,10 @@ export function toProductPageData(product: Product): ProductPageData {
     packageWeight: product.bagWeight,
     price: product.price,
     priceLabel: formatProductPrice(product),
+    priceMode: product.priceMode,
+    currency: product.currency,
+    inStock: product.inStock,
+    isPublished: product.isPublished,
     availability: product.inStock ? "Уточняется" : "Под заказ",
     usageStages: product.stage,
     tasks: [...product.tasks.slice(0, 3), product.packageSize],
